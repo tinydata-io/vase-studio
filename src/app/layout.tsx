@@ -3,6 +3,7 @@ import { Inter as FontSans } from "next/font/google";
 import "./globals.css";
 import { cn } from "../lib/utils";
 const fontSans = FontSans({ subsets: ["latin"], variable: "--font-sans" });
+import { Footer } from "@/components/Footer/Footer";
 
 export const metadata: Metadata = {
   title: "Vase Studio",
@@ -19,10 +20,11 @@ export default function RootLayout({
     <html lang="en">
       <body
         className={cn(
-          "h-screen bg-background font-sans antialiased",
+          "flex flex-col h-screen bg-background font-sans antialiased",
           fontSans.variable
         )}>
         {children}
+        <Footer />
       </body>
     </html>
   );
