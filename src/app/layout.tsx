@@ -23,7 +23,6 @@ export default function RootLayout({
           "h-screen bg-background font-sans antialiased",
           fontSans.variable
         )}>
-        {/* <nav className="h-5">nawigacja</nav> */}
         {children}
         <Footer />
       </body>
