@@ -1,6 +1,8 @@
+import { SizeUnit } from "@/lib/types";
 import { PointSet } from ".";
+import { generateProfileSectionCurve } from "./curve";
 
-type Vec2 = {
+export type Vec2 = {
   x: number;
   y: number;
 };
@@ -22,10 +24,40 @@ export type DrawProps = {
   maxOffset: number;
 };
 
+export type Profile = {
+  referencePoints: ProfilePoint[];
+  controlPoints: ProfilePoint[];
+  curvePoints: Vec2[];
+  sections: number;
+  angleStep: number;
+};
+
+export const distanceSqr = (a: Vec2, b: Vec2): number => {
+  const dx = a.x - b.x;
+  const dy = a.y - b.y;
+
+  return dx * dx + dy * dy;
+};
+
+export const distance = (a: Vec2, b: Vec2): number => {
+  return Math.sqrt(distanceSqr(a, b));
+};
+
 export const pointOnCircle = (radius: number, angle: number): Vec2 => {
   return {
     x: radius * Math.cos(angle),
     y: radius * Math.sin(angle),
+  };
+};
+
+export const rotate = (
+  point: Vec2,
+  cosAngle: number,
+  sinAngle: number
+): Vec2 => {
+  return {
+    x: point.x * cosAngle - point.y * sinAngle,
+    y: point.x * sinAngle + point.y * cosAngle,
   };
 };
 
@@ -77,35 +109,79 @@ export const sortProfilePoints = (profilePoints: ProfilePoint[]) => {
   });
 };
 
-export const generateProfilePoints = (
+export const generateProfile = (
   profileRadius: number,
   sections: number,
   pointSets: PointSet[],
   angleStart: number,
-  angleStep: number
-): ProfilePoint[] => {
-  const points: ProfilePoint[] = [];
+  angleStep: number,
+  sizeUnit: SizeUnit
+): Profile => {
+  const referencePoints: ProfilePoint[] = [];
 
-  for (let i = 0; i < sections; i++) {
-    const minAngle = angleStart + angleStep * i;
-    const maxAngle = minAngle + angleStep;
+  const minAngle = angleStart + angleStep;
+  const maxAngle = minAngle + angleStep;
 
-    pointSets.forEach((pointSet, index) => {
-      points.push(
-        ...generateSegmentProfilePoints(
-          profileRadius,
-          minAngle,
-          maxAngle,
-          pointSet,
-          index
-        )
-      );
+  pointSets.forEach((pointSet, index) => {
+    referencePoints.push(
+      ...generateSegmentProfilePoints(
+        profileRadius,
+        minAngle,
+        maxAngle,
+        pointSet,
+        index
+      )
+    );
+  });
+
+  sortProfilePoints(referencePoints);
+
+  // TODO: remove before rollout
+  console.time("generateProfileCurve");
+
+  const curveReferencePoints = generateProfileSectionCurve(
+    referencePoints,
+    minAngle,
+    maxAngle,
+    sizeUnit
+  );
+
+  // TODO: remove before rollout
+  console.timeEnd("generateProfileCurve");
+
+  const points = [...referencePoints];
+  const curvePoints = [...curveReferencePoints];
+
+  // generate full profile by rotating reference points for each section
+  for (let i = 1; i < sections; i++) {
+    const rotationAngle = angleStep * i;
+    const cosAngle = Math.cos(rotationAngle);
+    const sinAngle = Math.sin(rotationAngle);
+
+    referencePoints.forEach((point) => {
+      points.push({
+        ...point,
+        position: rotate(point.position, cosAngle, sinAngle),
+      });
+    });
+
+    curveReferencePoints.forEach((point) => {
+      curvePoints.push(rotate(point, cosAngle, sinAngle));
     });
   }
 
   sortProfilePoints(points);
 
-  return points;
+  // TODO: remove before rollout
+  console.log("total curve points: ", curvePoints.length);
+
+  return {
+    referencePoints: referencePoints,
+    controlPoints: points,
+    curvePoints: curvePoints,
+    sections: sections,
+    angleStep: angleStep,
+  };
 };
 
 export const calculateDrawProps = (
