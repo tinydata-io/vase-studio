@@ -1,31 +1,37 @@
 import { DrawProps, pointOnCircle } from "./util";
 
-export const GuideLines = (props: DrawProps) => {
+export const GuideLines = ({
+  profileRadius,
+  sections,
+  angleStart,
+  angleStep,
+  strokeWidth,
+}: DrawProps) => {
   const dashedStroke = {
-    strokeWidth: props.strokeWidth,
+    strokeWidth: strokeWidth,
     stroke: "#AAAAAA",
-    strokeDasharray: `${props.strokeWidth * 4} ${props.strokeWidth * 4}`,
+    strokeDasharray: `${strokeWidth * 4} ${strokeWidth * 4}`,
     fill: "none",
   };
 
   const sectionLineEndPoints = [];
 
-  for (let i = 0; i < props.sections; i++) {
-    const angle = props.angleStart + props.angleStep * i;
-    const p = pointOnCircle(props.profileRadius, angle);
+  for (let i = 0; i < sections; i++) {
+    const angle = angleStart + angleStep * i;
+    const p = pointOnCircle(profileRadius, angle);
     sectionLineEndPoints.push(p);
   }
 
-  const arcStartAngle = props.angleStart;
-  const arcEndAngle = arcStartAngle + props.angleStep;
-  const arcRadius = props.profileRadius / 2;
+  const arcStartAngle = angleStart;
+  const arcEndAngle = arcStartAngle + angleStep;
+  const arcRadius = profileRadius / 2;
 
   const arcStart = pointOnCircle(arcRadius, arcStartAngle);
   const arcEnd = pointOnCircle(arcRadius, arcEndAngle);
 
   return (
     <>
-      <circle cx={0} cy={0} r={props.profileRadius} {...dashedStroke} />
+      <circle cx={0} cy={0} r={profileRadius} {...dashedStroke} />
 
       <path
         d={`M ${arcStart.x} ${arcStart.y} A ${arcRadius} ${arcRadius} 0 0 1 ${arcEnd.x} ${arcEnd.y}`}

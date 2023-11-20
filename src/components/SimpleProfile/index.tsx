@@ -29,29 +29,31 @@ export type SimpleProfileProps = {
   height: number;
 };
 
-export const SimpleProfile = (props: SimpleProfileProps) => {
-  const maxOffset = props.pointSets.reduce(
+export const SimpleProfile = ({
+  pointSets,
+  profileDiameter,
+  sections,
+  width,
+  height,
+}: SimpleProfileProps) => {
+  const maxOffset = pointSets.reduce(
     (max, { offset }) => Math.max(max, offset),
     0
   );
 
-  const profileRadius = props.profileDiameter / 2;
-  const drawProps = calculateDrawProps(
-    profileRadius,
-    maxOffset,
-    props.sections
-  );
+  const profileRadius = profileDiameter / 2;
+  const drawProps = calculateDrawProps(profileRadius, maxOffset, sections);
 
   const profilePoints = generateProfilePoints(
     profileRadius,
-    props.sections,
-    props.pointSets,
+    sections,
+    pointSets,
     drawProps.angleStart,
     drawProps.angleStep
   );
 
   return (
-    <svg viewBox={drawProps.viewBox} width={props.width} height={props.height}>
+    <svg viewBox={drawProps.viewBox} width={width} height={height}>
       <GuideLines {...drawProps} />
       <GuideArc {...drawProps} />
       <ProfilePoints profilePoints={profilePoints} {...drawProps} />

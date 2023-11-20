@@ -1,22 +1,27 @@
 import { DrawProps, pointOnCircle } from "./util";
 
-export const FiveDegrees = (Math.PI * 2) / 72;
+export const FIVE_DEGREES = (Math.PI * 2) / 72;
 
-export const GuideArc = (props: DrawProps) => {
+export const GuideArc = ({
+  profileRadius,
+  angleStart,
+  angleStep,
+  strokeWidth,
+}: DrawProps) => {
   const arcStroke = {
-    strokeWidth: props.strokeWidth,
+    strokeWidth: strokeWidth,
     stroke: "#000000",
     fill: "none",
   };
 
-  const arcStartAngle = props.angleStart;
-  const arcEndAngle = arcStartAngle + props.angleStep;
-  const arcRadius = props.profileRadius / 2;
+  const arcStartAngle = angleStart;
+  const arcEndAngle = arcStartAngle + angleStep;
+  const arcRadius = profileRadius / 2;
 
   const arcStart = pointOnCircle(arcRadius, arcStartAngle);
   const arcEnd = pointOnCircle(arcRadius, arcEndAngle);
-  const arcCapSize = props.strokeWidth * 4;
-  const arcCapAngleLength = Math.min(props.angleStep / 4, FiveDegrees);
+  const arcCapSize = strokeWidth * 4;
+  const arcCapAngleLength = Math.min(angleStep / 4, FIVE_DEGREES);
 
   const arcStartCap = [
     pointOnCircle(arcRadius + arcCapSize, arcStartAngle + arcCapAngleLength),
