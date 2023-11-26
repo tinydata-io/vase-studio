@@ -1,4 +1,6 @@
-import { DrawProps, pointOnCircle } from "./util";
+import { pointOnCircle } from "@/lib/math2d";
+
+import { DrawProps } from "./types";
 
 export const GuideLines = ({
   profileRadius,

@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
 
-import { SimpleProfile, PointSet } from ".";
+import { PointSet } from "./types";
+import { SimpleProfile } from ".";
 
 const meta: Meta<typeof SimpleProfile> = {
   component: SimpleProfile,

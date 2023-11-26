@@ -1,4 +1,6 @@
-import { DrawProps, Vec2 } from "./util";
+import { Vec2 } from "@/lib/math2d";
+
+import { DrawProps } from "./types";
 
 type ProfileCurveProps = DrawProps & {
   profileCurve: Vec2[];
