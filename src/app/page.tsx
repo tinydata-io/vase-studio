@@ -1,11 +1,13 @@
-import Image from "next/image";
-import logo from "../assets/vaseLogo.svg";
-
 export default function Home() {
   return (
-    <main className="flex h-full items-center justify-center p-12 pb-[88px]">
-      <div className="relative w-full h-3/5">
-        <Image src={logo} alt="Vase Studio Logo" fill />
+    <main className="flex h-full  p-4 pb-[56px]">
+      <div className="flex justify-center items-center w-3/5 bg-red-200">
+        <div className="relative flex justify-center items-center h-4/5 xl:h-full aspect-square bg-green-200">
+          {/* Place for vase image component */}
+        </div>
+      </div>
+      <div className="flex justify-center items-start w-2/5 bg-amber-200">
+        {/* Place for Tabs Component */}
       </div>
     </main>
   );
