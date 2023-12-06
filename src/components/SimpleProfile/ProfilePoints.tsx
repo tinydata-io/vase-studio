@@ -1,4 +1,4 @@
-import { DrawProps, ProfilePoint } from "./util";
+import { DrawProps, ProfilePoint } from "./types";
 
 type ProfilePointsProps = DrawProps & {
   profilePoints: ProfilePoint[];
