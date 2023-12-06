@@ -1,3 +1,5 @@
+import { PropertyEditor } from "@/components/PropertyEditor";
+
 export default function Home() {
   return (
     <main className="flex h-full  p-4 pb-[56px]">
@@ -6,8 +8,9 @@ export default function Home() {
           {/* Place for vase image component */}
         </div>
       </div>
-      <div className="flex justify-center items-start w-2/5 bg-amber-200">
+      <div className="flex justify-center items-start w-2/5 ">
         {/* Place for Tabs Component */}
+        <PropertyEditor />
       </div>
     </main>
   );

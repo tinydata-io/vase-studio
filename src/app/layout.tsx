@@ -1,7 +1,7 @@
 import Image from "next/image";
 import type { Metadata } from "next";
 import { Inter as FontSans } from "next/font/google";
-import { cn } from "../lib/utils";
+import { cn } from "@/lib/utils";
 import { Footer } from "@/components/Footer";
 import logo from "../assets/vaseLogo.svg";
 import "./globals.css";
