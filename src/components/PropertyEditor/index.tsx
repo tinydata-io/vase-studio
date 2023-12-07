@@ -7,52 +7,46 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import { Button } from "@/components/ui/button";
 
 export const PropertyEditor = () => {
   return (
-    <Tabs defaultValue="account" className="w-[400px]">
+    <Tabs defaultValue="configure" className="w-[400px]">
       <TabsList className="grid w-full grid-cols-2">
-        <TabsTrigger value="account">Account</TabsTrigger>
-        <TabsTrigger value="password">Password</TabsTrigger>
+        <TabsTrigger value="configure">Configure</TabsTrigger>
+        <TabsTrigger value="customizeShape">Customize shape</TabsTrigger>
       </TabsList>
-      <TabsContent value="account">
+      <TabsContent value="configure">
         <Card>
-          <CardHeader>
-            <CardTitle>Account</CardTitle>
-            <CardDescription>
-              Make changes to your account here. Click save when you're done.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            {/* <div className="space-y-1">
-              <Label htmlFor="name">Name</Label>
-              <Input id="name" defaultValue="Pedro Duarte" />
-            </div> */}
-            {/* <div className="space-y-1">
-              <Label htmlFor="username">Username</Label>
-              <Input id="username" defaultValue="@peduarte" />
-            </div> */}
+          <CardContent className="space-y-2 pt-6 pb-2">
+            Dimensions Form
+            <Separator />
+            Profile
+            <Separator />
           </CardContent>
-          <CardFooter>{/* <Button>Save changes</Button> */}</CardFooter>
+          <CardFooter>
+            <Button className="w-full">Export</Button>
+          </CardFooter>
         </Card>
       </TabsContent>
-      <TabsContent value="password">
+      <TabsContent value="customizeShape">
+        {/* TODO - Change sample content to the right one.  */}
         <Card>
           <CardHeader>
-            <CardTitle>Password</CardTitle>
+            <CardTitle>Customize shape</CardTitle>
             <CardDescription>
-              Change your password here. After saving, you'll be logged out.
+              Lorem ipsum dolor sit, amet consectetur adipisicing elit. Nisi ad,
+              quaerat nesciunt libero necessitatibus aspernatur ab omnis
+              doloremque perferendis! Est sapiente sint atque accusantium
+              blanditiis consectetur iste rerum, dolorum soluta!
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-2">
-            {/* <div className="space-y-1">
-              <Label htmlFor="current">Current password</Label>
-              <Input id="current" type="password" />
-            </div> */}
-            {/* <div className="space-y-1">
-              <Label htmlFor="new">New password</Label>
-              <Input id="new" type="password" />
-            </div> */}
+            Lorem ipsum dolor sit amet consectetur, adipisicing elit. Labore
+            excepturi cupiditate natus modi minus, tempore similique, animi vel
+            rem alias adipisci culpa molestiae sapiente optio nesciunt ea
+            aliquam. Sapiente, eaque.
           </CardContent>
           <CardFooter>{/* <Button>Save password</Button> */}</CardFooter>
         </Card>
