@@ -10,6 +10,10 @@ export const distanceSqr = (a: Vec2, b: Vec2): number => {
   return dx * dx + dy * dy;
 };
 
+export const angle = (v: Vec2): number => {
+  return Math.atan2(v.y, v.x) + Math.PI;
+};
+
 export const distance = (a: Vec2, b: Vec2): number => {
   return Math.sqrt(distanceSqr(a, b));
 };
@@ -18,6 +22,36 @@ export const pointOnCircle = (radius: number, angle: number): Vec2 => {
   return {
     x: radius * Math.cos(angle),
     y: radius * Math.sin(angle),
+  };
+};
+
+export const sub = (a: Vec2, b: Vec2): Vec2 => {
+  return {
+    x: a.x - b.x,
+    y: a.y - b.y,
+  };
+};
+
+export const add = (a: Vec2, b: Vec2): Vec2 => {
+  return {
+    x: a.x + b.x,
+    y: a.y + b.y,
+  };
+};
+
+export const left = (v: Vec2): Vec2 => {
+  return {
+    x: -v.y,
+    y: v.x,
+  };
+};
+
+export const normalised = (v: Vec2): Vec2 => {
+  const length = Math.sqrt(v.x * v.x + v.y * v.y);
+
+  return {
+    x: v.x / length,
+    y: v.y / length,
   };
 };
 

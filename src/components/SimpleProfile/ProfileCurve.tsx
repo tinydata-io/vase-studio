@@ -12,6 +12,8 @@ export const ProfileCurve = ({
 }: ProfileCurveProps) => {
   const points = profileCurve.map((p) => `${p.x},${p.y}`).join(" ");
 
+  console.log(JSON.stringify(profileCurve));
+
   return (
     <polyline
       points={points}

@@ -53,9 +53,8 @@ export const SimpleProfile = ({
     <svg viewBox={drawProps.viewBox} width={width} height={height}>
       <GuideLines {...drawProps} />
       <GuideArc {...drawProps} />
-
-      <ProfileCurve profileCurve={profile.curvePoints} {...drawProps} />
       <ProfilePoints profilePoints={profile.controlPoints} {...drawProps} />
+      <ProfileCurve profileCurve={profile.curvePoints} {...drawProps} />
     </svg>
   );
 };

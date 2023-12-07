@@ -16,7 +16,7 @@ export const SimpleProfileSample: Story = {
     width: 512,
     height: 512,
     sections: 4,
-    profileDiameter: 80,
+    profileDiameter: 8,
   },
   render: ({ ...args }) => {
     const pointSets: PointSet[] = [
@@ -28,14 +28,14 @@ export const SimpleProfileSample: Story = {
         color: "red",
       },
       {
-        offset: 5,
+        offset: 0.5,
         count: 4,
         angleStart: 0.125,
         angleStep: 0.25,
         color: "blue",
       },
       {
-        offset: -5,
+        offset: -0.5,
         count: 2,
         angleStart: 0.4,
         angleStep: 0.2,

@@ -98,6 +98,29 @@ export const sortProfilePoints = (profilePoints: ProfilePoint[]) => {
   });
 };
 
+export const sortCurvePoints = (curvePoints: Vec2[]) => {
+  const pointsWithAngles = curvePoints.map((point) => {
+    return {
+      point: point,
+      angle: Math.atan2(point.y, point.x),
+    };
+  });
+
+  pointsWithAngles.sort((a, b) => {
+    if (a.angle < b.angle) {
+      return -1;
+    }
+
+    if (a.angle > b.angle) {
+      return 1;
+    }
+
+    return 0;
+  });
+
+  return pointsWithAngles.map((point) => point.point);
+};
+
 // generate curve for a single section
 export const generateProfileSectionCurve = (
   profileSectionPoints: ProfilePoint[],
@@ -198,6 +221,9 @@ export const generateProfileSectionCurve = (
   const minSimplifyArea = minSimplifyAreaForUnit(sizeUnit);
   const simplified = simplifyProfilePoints(points, minSimplifyArea);
 
+  // TODO: remove before rollout
+  console.log("simplified points: ", simplified.length);
+
   return simplified;
 };
 
@@ -263,6 +289,7 @@ export const generateProfile = (
   }
 
   sortProfilePoints(points);
+  sortCurvePoints(curvePoints);
 
   // TODO: remove before rollout
   console.log("total curve points: ", curvePoints.length);
