@@ -4,8 +4,6 @@ import { useMemo, useRef } from "react";
 import * as THREE from "three";
 import { SizeUnit, convertToCentimetersScale } from "@/lib/units";
 
-import { NormalsHelper } from "./helpers";
-
 type VasePreviewProps = {
   unit: SizeUnit;
   height: number;
@@ -98,6 +96,7 @@ const Vase = ({ profilePoints, height, rotation }: VaseProps) => {
   const getLayerProfile = function (y: number) {
     const p = y / height;
     const layerRotation = p * rotation;
+    const layerScale = Math.sin(p * 6) / 4 + 0.75;
 
     return profilePoints.map((p) => {
       const sinAngle = Math.sin(layerRotation);
@@ -105,8 +104,8 @@ const Vase = ({ profilePoints, height, rotation }: VaseProps) => {
       const rotated = rotate(p, cosAngle, sinAngle);
 
       return {
-        x: rotated.x,
-        y: rotated.y,
+        x: rotated.x * layerScale,
+        y: rotated.y * layerScale,
       };
     });
   };
