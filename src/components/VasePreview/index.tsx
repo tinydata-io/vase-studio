@@ -17,7 +17,7 @@ import {
   Noise,
 } from "@react-three/postprocessing";
 
-import { BlendFunction, Resizer, KernelSize } from "postprocessing";
+import { BlendFunction, Resolution, KernelSize } from "postprocessing";
 
 import { useMemo, useRef } from "react";
 import * as THREE from "three";
@@ -309,8 +309,8 @@ const VaseComponent = ({ profilePoints, height, rotation }: VaseProps) => {
             edgeStrength={8} // the edge strength
             visibleEdgeColor={0x000000} // the color of visible edges
             hiddenEdgeColor={0xff0000} // the color of hidden edges
-            width={Resizer.AUTO_SIZE} // render width
-            height={Resizer.AUTO_SIZE} // render height
+            width={Resolution.AUTO_SIZE} // render width
+            height={Resolution.AUTO_SIZE} // render height
             kernelSize={KernelSize.VERY_SMALL} // blur kernel size
             blur={true} // whether the outline should be blurred
           />
