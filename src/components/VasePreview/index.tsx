@@ -1,48 +1,79 @@
+"use client";
+
 import { Vec2, add, left, normalised, rotate, sub } from "@/lib/math2d";
-import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import {
+  Canvas,
+  useFrame,
+  useThree,
+  extend,
+  Object3DNode,
+} from "@react-three/fiber";
+import {
+  EffectComposer,
+  Outline,
+  Selection,
+  Select,
+  SMAA,
+  Noise,
+} from "@react-three/postprocessing";
+
+import { BlendFunction, Resizer, KernelSize } from "postprocessing";
+
 import { useMemo, useRef } from "react";
 import * as THREE from "three";
-import { SizeUnit, convertToCentimetersScale } from "@/lib/units";
+
+import { convertToCentimetersScale } from "@/lib/units";
+import { Vase } from "@/lib/types";
+import { GeneratedProfile } from "@/components/SimpleProfile/types";
+import { generateProfile } from "@/components/SimpleProfile/util";
 
 type VasePreviewProps = {
-  unit: SizeUnit;
-  height: number;
-  profilePoints: Vec2[];
-  profileMaxRadius: number;
-  rotations: number;
+  vase: Vase;
 };
 
-export const VasePreview = ({
-  profilePoints,
-  unit,
-  height,
-  profileMaxRadius,
-  rotations,
-}: VasePreviewProps) => {
+export const VasePreview = ({ vase }: VasePreviewProps) => {
+  const generatedProfile = useMemo<GeneratedProfile>(() => {
+    const radius = vase.slices[0].radius.value;
+    return generateProfile(radius, vase.sizeUnit, vase.profile);
+  }, [vase]);
+
   const points = useMemo<Vec2[]>(() => {
-    const scale = convertToCentimetersScale(unit);
-    return profilePoints.map((p) => {
+    const scale = convertToCentimetersScale(vase.sizeUnit);
+    return generatedProfile.curvePoints.map((p) => {
       return {
         x: p.x * scale,
         y: p.y * scale,
       };
     });
-  }, [profilePoints, unit]);
+  }, [vase.sizeUnit, generatedProfile.curvePoints]);
 
-  const rotation = rotations * Math.PI * 2;
+  const profileMaxRadius = useMemo<number>(() => {
+    return vase.slices.reduce((max, s) => {
+      return Math.max(max, s.radius.value);
+    }, 0);
+  }, [vase.slices]);
+
+  // TODO
+  const rotation = 0.2 * Math.PI * 2;
+
+  // camera.position.x = 0;
+  // camera.position.y = 12;
+  // camera.position.z = -10;
+  // camera.lookAt(new THREE.Vector3(0, 5, 0));
 
   // border is temporary to show the size of the canvas
   return (
     <div className="border-dashed border-gray-300 border-2 h-full aspect-square">
-      <Canvas>
+      <Canvas shadows>
         <ambientLight intensity={Math.PI / 2} />
-        <pointLight position={[-5, 30, -30]} decay={0} intensity={Math.PI} />
-        <Vase
+
+        <VaseComponent
           profilePoints={points}
-          height={height}
+          height={vase.height}
           maxRadius={profileMaxRadius}
           rotation={rotation}
         />
+        <fog attach="fog" color="white" near={30} far={40} />
       </Canvas>
     </div>
   );
@@ -55,10 +86,14 @@ type VaseProps = {
   rotation: number;
 };
 
-const Vase = ({ profilePoints, height, rotation }: VaseProps) => {
-  const meshRef = useRef<THREE.Mesh>(null!);
+const VaseComponent = ({ profilePoints, height, rotation }: VaseProps) => {
+  const mainMeshRef = useRef<THREE.Mesh>(null!);
+  const wireframeMeshRef = useRef<THREE.Mesh>(null!);
+  const lightRef = useRef<THREE.DirectionalLight>(null!);
 
-  useThree(({ camera }) => {
+  const meshRefs = [mainMeshRef, wireframeMeshRef];
+
+  const state = useThree(({ camera }) => {
     camera.position.x = 0;
     camera.position.y = 12;
     camera.position.z = -10;
@@ -66,8 +101,25 @@ const Vase = ({ profilePoints, height, rotation }: VaseProps) => {
   });
 
   useFrame((state, delta) => {
-    if (meshRef.current) {
-      meshRef.current.rotation.y += delta * 0.2;
+    meshRefs.forEach((meshRef) => {
+      if (meshRef.current) {
+        meshRef.current.rotation.y += delta * 0.2;
+      }
+    });
+
+    const gl = state.gl.getContext();
+
+    if (lightRef.current) {
+      lightRef.current.shadow.mapSize.width = 512;
+      lightRef.current.shadow.mapSize.height = 512;
+      lightRef.current.shadow.camera.near = 0.5;
+      lightRef.current.shadow.camera.far = 200;
+      lightRef.current.shadow.camera.left = -10;
+      lightRef.current.shadow.camera.right = 10;
+      lightRef.current.shadow.camera.top = 10;
+      lightRef.current.shadow.camera.bottom = -10;
+      lightRef.current.shadow.radius = 16;
+      lightRef.current.shadow.blurSamples = 32;
     }
   });
 
@@ -121,12 +173,6 @@ const Vase = ({ profilePoints, height, rotation }: VaseProps) => {
       const nPrevDir = left(normalised(sub(curr, prev)));
       const nNextDir = left(normalised(sub(next, curr)));
 
-      // rotate 90 degrees
-      //   const normal = {
-      //     x: -d.y,
-      //     y: d.x,
-      //   };
-
       const d = normalised(add(nPrevDir, nNextDir));
 
       const normal = {
@@ -139,6 +185,8 @@ const Vase = ({ profilePoints, height, rotation }: VaseProps) => {
 
     return normals;
   };
+
+  console.time("generation");
 
   let currentLayerIndices: number[] = [];
   let previousLayerIndices: number[] = [];
@@ -196,6 +244,8 @@ const Vase = ({ profilePoints, height, rotation }: VaseProps) => {
     previousLayerIndices = currentLayerIndices;
   }
 
+  console.timeEnd("generation");
+
   const geometry = new THREE.BufferGeometry();
 
   geometry.setIndex(indices);
@@ -211,9 +261,6 @@ const Vase = ({ profilePoints, height, rotation }: VaseProps) => {
 
   //geometry.computeVertexNormals();
 
-  console.log(meshRef);
-  console.log(meshRef.current);
-
   const lineMaterial = new THREE.LineBasicMaterial({
     color: 0x000000,
     linewidth: 2,
@@ -221,24 +268,59 @@ const Vase = ({ profilePoints, height, rotation }: VaseProps) => {
 
   return (
     <>
-      <mesh ref={meshRef} position={[0, 0, 0]} geometry={geometry}>
-        <meshStandardMaterial color="#4682b4" side={THREE.DoubleSide} />
-      </mesh>
-      {false &&
-        normals.map(([p1, n], index) => {
-          const scale = 0.5;
-          const p2 = new THREE.Vector3(
-            p1.x + scale * n.x,
-            p1.y + scale * n.y,
-            p1.z + scale * n.z
-          );
-
-          const geometry = new THREE.BufferGeometry().setFromPoints([p1, p2]);
-
-          return (
-            <line key={index} geometry={geometry} material={lineMaterial} />
-          );
-        })}
+      <directionalLight
+        ref={lightRef}
+        position={[-20, 45, -10]}
+        intensity={Math.PI}
+        castShadow
+      />
+      <Selection enabled={true}>
+        <Select enabled={true}>
+          <mesh
+            ref={mainMeshRef}
+            position={[0, 0, 0]}
+            geometry={geometry}
+            castShadow
+          >
+            <meshPhysicalMaterial color="#4682b4" side={THREE.DoubleSide} />
+          </mesh>
+          {/* <mesh
+            ref={wireframeMeshRef}
+            position={[0, 0, -0.02]}
+            geometry={geometry}
+          >
+            <meshStandardMaterial
+              color="#000000"
+              wireframe={true}
+              side={THREE.DoubleSide}
+              transparent={true}
+              opacity={0.05}
+              depthWrite={false}
+            />
+          </mesh> */}
+        </Select>
+        <mesh position={[0, -0.1, 0]} rotation-x={-Math.PI / 2} receiveShadow>
+          <circleGeometry args={[100]} />
+          <meshStandardMaterial color="#FFFFFF" />
+        </mesh>
+        <EffectComposer autoClear={false} multisampling={0}>
+          <Outline
+            blendFunction={BlendFunction.ALPHA} // set this to BlendFunction.ALPHA for dark outlines
+            edgeStrength={8} // the edge strength
+            visibleEdgeColor={0x000000} // the color of visible edges
+            hiddenEdgeColor={0xff0000} // the color of hidden edges
+            width={Resizer.AUTO_SIZE} // render width
+            height={Resizer.AUTO_SIZE} // render height
+            kernelSize={KernelSize.VERY_SMALL} // blur kernel size
+            blur={true} // whether the outline should be blurred
+          />
+          <Noise
+            premultiply // enables or disables noise premultiplication
+            blendFunction={BlendFunction.ADD} // blend mode
+            opacity={0.2} // noise opacity level
+          />
+        </EffectComposer>
+      </Selection>
     </>
   );
 };
