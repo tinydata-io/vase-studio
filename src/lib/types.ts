@@ -9,8 +9,8 @@ export type PointSet = {
   angleStart: number; // angle start, expressed as 0-1 in terms of section arc
   angleStep: number; // angle step, expressed as 0-1 in terms of section arc;
 
-  smoothIn?: number; // 0-1 to define the smoothness of the curve going into the point
-  smoothOut?: number; // 0-1 to define the smoothness of the curve going out of the point
+  weightIn?: number; // 0-1 to define the smoothness of the curve going into the point
+  weightOut?: number; // 0-1 to define the smoothness of the curve going out of the point
 };
 
 export type Profile = {
@@ -18,16 +18,16 @@ export type Profile = {
   pointSets: PointSet[];
 };
 
-export type SmoothNumber = {
+export type WeightedNumber = {
   value: number;
-  smoothIn?: number;
-  smoothOut?: number;
+  weightIn?: number;
+  weightOut?: number;
 };
 
 export type Slice = {
   position: number; // position of the slice, expressed as 0-1 in terms of vase height
-  radius: SmoothNumber;
-  rotation: SmoothNumber; // rotation of the slice, expressed in degrees
+  radius: WeightedNumber;
+  rotation: WeightedNumber; // rotation of the slice, expressed in degrees
 };
 
 export type Vase = {
