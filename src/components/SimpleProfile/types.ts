@@ -4,6 +4,8 @@ export type ProfilePoint = {
   position: Vec2;
   angle: number;
   pointSetIndex: number;
+  weightIn: number;
+  weightOut: number;
 };
 
 export type GeneratedProfile = {

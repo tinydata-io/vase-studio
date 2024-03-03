@@ -35,6 +35,8 @@ export const SimpleProfileDemo: Story = {
         {
           offset: {
             value: 0.5,
+            weightIn: 1,
+            weightOut: 1,
           },
           count: 4,
           angleStart: 0.125,

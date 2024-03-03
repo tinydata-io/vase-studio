@@ -69,6 +69,8 @@ export const generateSegmentProfilePoints = (
       position: position,
       angle: angle,
       pointSetIndex: pointSetIndex,
+      weightIn: pointSet.offset.weightIn || 0,
+      weightOut: pointSet.offset.weightOut || 0,
     });
   }
 
@@ -148,6 +150,13 @@ export const generateProfileSectionCurve = (
     rotate(sectionSecondPoint.position, sectionAngleCos, sectionAngleSin), // rotate sectionAngle (second point in next section)
   ];
 
+  const sp = [
+    sectionLastPoint,
+    ...profileSectionPoints,
+    sectionFirstPoint,
+    sectionSecondPoint,
+  ];
+
   const minDistance = minDistanceForUnit(sizeUnit);
   const minDistanceSqr = minDistance * minDistance;
 
@@ -161,11 +170,16 @@ export const generateProfileSectionCurve = (
     const p2 = pp[i + 1];
     const p3 = pp[i + 2];
 
+    const weightStart = sp[i].weightOut;
+    const weightEnd = sp[i + 1].weightIn;
+
     const segmentLength = estimateCatmullRomCurveLength(
       p0,
       p1,
       p2,
       p3,
+      weightStart,
+      weightEnd,
       minDistance
     );
 
@@ -174,7 +188,15 @@ export const generateProfileSectionCurve = (
 
     for (let j = 1; j < steps; j++) {
       const t = (j + 1) * step;
-      let point = catmullRomCurvePoint(p0, p1, p2, p3, t);
+      let point = catmullRomCurvePoint(
+        p0,
+        p1,
+        p2,
+        p3,
+        weightStart,
+        weightEnd,
+        t
+      );
 
       const pointAngle = Math.atan2(point.y, point.x);
 

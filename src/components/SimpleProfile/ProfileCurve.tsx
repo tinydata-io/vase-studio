@@ -10,7 +10,9 @@ export const ProfileCurve = ({
   profileCurve,
   strokeWidth,
 }: ProfileCurveProps) => {
-  const points = profileCurve.map((p) => `${p.x},${p.y}`).join(" ");
+  const points =
+    profileCurve.map((p) => `${p.x},${p.y}`).join(" ") +
+    ` ${profileCurve[0].x},${profileCurve[0].y}`; // close curve
 
   return (
     <polyline
