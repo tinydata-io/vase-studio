@@ -1,11 +1,14 @@
+import { Color } from "@/lib/types";
 import { DrawProps, ProfilePoint } from "./types";
 
 type ProfilePointsProps = DrawProps & {
   profilePoints: ProfilePoint[];
+  colors: Color[];
 };
 
 export const ProfilePoints = ({
   profilePoints,
+  colors,
   strokeWidth,
 }: ProfilePointsProps) => {
   return profilePoints.map((p, i) => (
@@ -13,8 +16,8 @@ export const ProfilePoints = ({
       key={i}
       cx={p.position.x}
       cy={p.position.y}
-      r={strokeWidth * 2}
-      fill={p.color}
+      r={strokeWidth * 4}
+      fill={colors[p.pointSetIndex % colors.length]}
     />
   ));
 };

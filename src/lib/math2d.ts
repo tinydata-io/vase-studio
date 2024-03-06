@@ -10,6 +10,10 @@ export const distanceSqr = (a: Vec2, b: Vec2): number => {
   return dx * dx + dy * dy;
 };
 
+export const angle = (v: Vec2): number => {
+  return Math.atan2(v.y, v.x) + Math.PI;
+};
+
 export const distance = (a: Vec2, b: Vec2): number => {
   return Math.sqrt(distanceSqr(a, b));
 };
@@ -18,6 +22,36 @@ export const pointOnCircle = (radius: number, angle: number): Vec2 => {
   return {
     x: radius * Math.cos(angle),
     y: radius * Math.sin(angle),
+  };
+};
+
+export const sub = (a: Vec2, b: Vec2): Vec2 => {
+  return {
+    x: a.x - b.x,
+    y: a.y - b.y,
+  };
+};
+
+export const add = (a: Vec2, b: Vec2): Vec2 => {
+  return {
+    x: a.x + b.x,
+    y: a.y + b.y,
+  };
+};
+
+export const left = (v: Vec2): Vec2 => {
+  return {
+    x: -v.y,
+    y: v.x,
+  };
+};
+
+export const normalised = (v: Vec2): Vec2 => {
+  const length = Math.sqrt(v.x * v.x + v.y * v.y);
+
+  return {
+    x: v.x / length,
+    y: v.y / length,
   };
 };
 
@@ -58,16 +92,28 @@ export const simplifyProfilePoints = (
   return simplified;
 };
 
+export const lerpPoint = (a: Vec2, b: Vec2, t: number): Vec2 => {
+  return {
+    x: a.x + (b.x - a.x) * t,
+    y: a.y + (b.y - a.y) * t,
+  };
+};
+
 // https://dev.to/ndesmic/splines-from-scratch-catmull-rom-3m66
 export const catmullRomCurvePoint = (
   p0: Vec2,
   p1: Vec2,
   p2: Vec2,
   p3: Vec2,
+  weightStart: number,
+  weightEnd: number,
   t: number
 ): Vec2 => {
   const t2 = t * t;
   const t3 = t2 * t;
+
+  p0 = lerpPoint(p0, p1, weightStart);
+  p3 = lerpPoint(p3, p2, weightEnd);
 
   const b1 = -t3 + 2 * t2 - t;
   const b2 = 3 * t3 - 5 * t2 + 2;
@@ -85,6 +131,8 @@ export const estimateCatmullRomCurveLength = (
   p1: Vec2,
   p2: Vec2,
   p3: Vec2,
+  weightStart: number,
+  weightEnd: number,
   minDistance: number
 ): number => {
   const segmentLenth = distance(p1, p2);
@@ -92,11 +140,19 @@ export const estimateCatmullRomCurveLength = (
   const step = 1 / steps;
 
   let length = 0;
-  let prev = catmullRomCurvePoint(p0, p1, p2, p3, 0);
+  let prev = catmullRomCurvePoint(p0, p1, p2, p3, weightStart, weightEnd, 0);
 
   for (let i = 0; i < steps; i++) {
     const t = (i + 1) * step;
-    const point = catmullRomCurvePoint(p0, p1, p2, p3, t);
+    const point = catmullRomCurvePoint(
+      p0,
+      p1,
+      p2,
+      p3,
+      weightStart,
+      weightEnd,
+      t
+    );
 
     length += distance(prev, point);
 
