@@ -241,14 +241,8 @@ export const generateProfileSectionCurve = (
     points.pop();
   }
 
-  // TODO: remove before rollout
-  console.log("generated points: ", points.length);
-
   const minSimplifyArea = minSimplifyAreaForUnit(sizeUnit);
   const simplified = simplifyProfilePoints(points, minSimplifyArea);
-
-  // TODO: remove before rollout
-  console.log("simplified points: ", simplified.length);
 
   return simplified;
 };
@@ -316,9 +310,6 @@ export const generateProfile = (
 
   sortProfilePoints(points);
   sortCurvePoints(curvePoints);
-
-  // TODO: remove before rollout
-  console.log("total curve points: ", curvePoints.length);
 
   return {
     referencePoints: referencePoints,
