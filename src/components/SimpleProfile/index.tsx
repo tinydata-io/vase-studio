@@ -11,11 +11,12 @@
 import { SizeUnit } from "@/lib/units";
 import { Color, VaseProfile } from "@/lib/types";
 
+import { Curve } from "@/components/svg";
+
 import { calculateDrawProps, generateProfile } from "./util";
 import { GuideLines } from "./GuideLines";
 import { GuideArc } from "./GuideArc";
 import { ProfilePoints } from "./ProfilePoints";
-import { ProfileCurve } from "./ProfileCurve";
 
 export type SimpleProfileProps = {
   profile: VaseProfile;
@@ -58,9 +59,10 @@ export const SimpleProfile = ({
         colors={colors}
         {...drawProps}
       />
-      <ProfileCurve
-        profileCurve={generatedProfile.curvePoints}
-        {...drawProps}
+      <Curve
+        curvePoints={generatedProfile.curvePoints}
+        strokeWidth={drawProps.strokeWidth}
+        closed={true}
       />
     </svg>
   );
