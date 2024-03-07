@@ -160,9 +160,9 @@ export const generateProfileSectionCurve = (
   const minDistance = minDistanceForUnit(sizeUnit);
   const minDistanceSqr = minDistance * minDistance;
 
-  let prev = pp[1];
-  let prevAngle = Math.atan2(prev.y, prev.x);
-  const points: Vec2[] = [prev];
+  const points: Vec2[] = [];
+
+  const minSimplifyArea = minSimplifyAreaForUnit(sizeUnit);
 
   for (let i = 1; i < pp.length - 2; i++) {
     const p0 = pp[i - 1];
@@ -172,6 +172,9 @@ export const generateProfileSectionCurve = (
 
     const weightStart = sp[i].weightOut;
     const weightEnd = sp[i + 1].weightIn;
+
+    let prev = p1;
+    let prevAngle = Math.atan2(prev.y, prev.x);
 
     const segmentLength = estimateCatmullRomCurveLength(
       p0,
@@ -186,8 +189,10 @@ export const generateProfileSectionCurve = (
     const steps = Math.ceil(segmentLength / minDistance);
     const step = 1 / steps;
 
+    const segmentPoints: Vec2[] = [p1];
+
     for (let j = 1; j < steps; j++) {
-      const t = (j + 1) * step;
+      const t = j * step;
       let point = catmullRomCurvePoint(
         p0,
         p1,
@@ -221,14 +226,22 @@ export const generateProfileSectionCurve = (
         continue;
       }
 
-      points.push(point);
+      segmentPoints.push(point);
       prev = point;
       prevAngle = pointAngle;
     }
+
+    // simplify each segment independently
+    const simplifiedSegmentPoints = simplifyProfilePoints(
+      segmentPoints,
+      minSimplifyArea
+    );
+
+    points.push(...simplifiedSegmentPoints);
   }
 
-  // no points generated
-  if (points.length == 0) {
+  // not enough points generated
+  if (points.length < 3) {
     return [];
   }
 
@@ -241,10 +254,7 @@ export const generateProfileSectionCurve = (
     points.pop();
   }
 
-  const minSimplifyArea = minSimplifyAreaForUnit(sizeUnit);
-  const simplified = simplifyProfilePoints(points, minSimplifyArea);
-
-  return simplified;
+  return points;
 };
 
 export const generateProfile = (
