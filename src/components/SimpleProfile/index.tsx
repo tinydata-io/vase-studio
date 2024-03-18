@@ -25,6 +25,7 @@ export type SimpleProfileProps = {
   colors: Color[];
   width: number;
   height: number;
+  debugPoints?: boolean;
 };
 
 export const SimpleProfile = ({
@@ -34,6 +35,7 @@ export const SimpleProfile = ({
   width,
   height,
   colors,
+  debugPoints,
 }: SimpleProfileProps) => {
   const maxOffset = profile.pointSets.reduce(
     (max, { offset }) => Math.max(max, offset.value),
@@ -64,6 +66,16 @@ export const SimpleProfile = ({
         strokeWidth={drawProps.strokeWidth}
         closed={true}
       />
+      {debugPoints &&
+        generatedProfile.curvePoints.map((cp, index) => (
+          <circle
+            key={index}
+            cx={cp.x}
+            cy={cp.y}
+            r={drawProps.strokeWidth / 2}
+            fill="red"
+          />
+        ))}
     </svg>
   );
 };
