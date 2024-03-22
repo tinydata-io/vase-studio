@@ -1,3 +1,5 @@
+import log from "loglevel";
+
 import {
   Vec2,
   catmullRomCurvePoint,
@@ -284,8 +286,7 @@ export const generateProfile = (
 
   sortProfilePoints(referencePoints);
 
-  // TODO: remove before rollout
-  console.time("generateProfileCurve");
+  var startTime = performance.now();
 
   const curveReferencePoints = generateProfileSectionCurve(
     referencePoints,
@@ -294,8 +295,9 @@ export const generateProfile = (
     sizeUnit
   );
 
-  // TODO: remove before rollout
-  console.timeEnd("generateProfileCurve");
+  var endTime = performance.now();
+
+  log.debug("generateProfileCurve", endTime - startTime, "ms");
 
   const points = [...referencePoints];
   const curvePoints = [...curveReferencePoints];
@@ -321,7 +323,7 @@ export const generateProfile = (
   sortProfilePoints(points);
   sortCurvePoints(curvePoints);
 
-  console.log("totalPoints", curvePoints.length);
+  log.debug("totalPoints", curvePoints.length);
 
   return {
     referencePoints: referencePoints,
