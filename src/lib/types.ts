@@ -27,8 +27,8 @@ export type VaseProfile = {
 // Slice describes parameters of a single horizontal section of the vase
 export type VaseSlice = {
   position: number; // position of the slice, expressed as 0-1 in terms of vase height
-  radius: WeightedNumber;
-  rotation: WeightedNumber; // rotation of the slice, expressed in degrees
+  radius?: WeightedNumber; // radius of the slice, expressed in sizeUnit
+  rotation?: WeightedNumber; // rotation of the slice, expressed in degrees
 };
 
 export type Vase = {

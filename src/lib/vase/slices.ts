@@ -1,4 +1,4 @@
-import { VaseSlice } from "@/lib/types";
+import { VaseSlice, WeightedNumber } from "@/lib/types";
 import {
   Vec2,
   catmullRomCurvePoint,
@@ -8,34 +8,53 @@ import {
 } from "@/lib/math2d";
 import { SidePathOptimisationSettings, SizeUnit } from "@/lib/units";
 
-export function getSideProfile(
+type SliceProperty = {
+  value: WeightedNumber;
+  y: number;
+};
+type PropertySelector = (slice: VaseSlice) => WeightedNumber | undefined;
+
+export function selectSlices(
   slices: VaseSlice[],
   height: number,
+  selector: PropertySelector
+): SliceProperty[] {
+  const sortedSlices = [...slices].sort((a, b) => a.position - b.position);
+  const result: SliceProperty[] = [];
+
+  for (const slice of sortedSlices) {
+    const value = selector(slice);
+
+    if (value) {
+      const y = slice.position * height;
+      result.push({ value, y });
+    }
+  }
+
+  return result;
+}
+
+export function evaluateSlices(
+  sliceProperties: SliceProperty[],
   sizeUnit: SizeUnit
 ): Vec2[] {
-  const sortedSlices = [...slices].sort((a, b) => a.position - b.position);
-
   const result = [];
-
-  const getPoint = (slice: VaseSlice): Vec2 => {
-    return { x: slice.radius.value, y: slice.position * height };
-  };
 
   const os = SidePathOptimisationSettings[sizeUnit];
 
-  for (let i = 0; i < sortedSlices.length - 1; i++) {
-    const s0 = sortedSlices[Math.max(0, i - 1)];
-    const s1 = sortedSlices[i];
-    const s2 = sortedSlices[i + 1];
-    const s3 = sortedSlices[Math.min(sortedSlices.length - 1, i + 2)];
+  for (let i = 0; i < sliceProperties.length - 1; i++) {
+    const s0 = sliceProperties[Math.max(0, i - 1)];
+    const s1 = sliceProperties[i];
+    const s2 = sliceProperties[i + 1];
+    const s3 = sliceProperties[Math.min(sliceProperties.length - 1, i + 2)];
 
-    const p0 = getPoint(s0);
-    const p1 = getPoint(s1);
-    const p2 = getPoint(s2);
-    const p3 = getPoint(s3);
+    const p0 = { x: s0.value.value, y: s0.y };
+    const p1 = { x: s1.value.value, y: s1.y };
+    const p2 = { x: s2.value.value, y: s2.y };
+    const p3 = { x: s3.value.value, y: s3.y };
 
-    const weightStart = s1.radius.weightOut || 0;
-    const weightEnd = s2.radius.weightIn || 0;
+    const weightStart = s1.value.weightOut || 0;
+    const weightEnd = s2.value.weightIn || 0;
 
     const estimatedSegmentLength = estimateCatmullRomCurveLength(
       p0,
@@ -84,7 +103,7 @@ export function getSideProfile(
     points = simplifyProfilePoints(points, os.minSimplifyArea);
 
     // Remove the last point if it's not the last segment, because it's the same as the first point of the next segment
-    if (i !== sortedSlices.length - 2) {
+    if (i !== sliceProperties.length - 2) {
       points.pop();
     }
 
@@ -92,4 +111,26 @@ export function getSideProfile(
   }
 
   return result;
+}
+
+export function getRadius(
+  slices: VaseSlice[],
+  height: number,
+  sizeUnit: SizeUnit
+): Vec2[] {
+  const sliceProperties = selectSlices(slices, height, (slice) => slice.radius);
+  return evaluateSlices(sliceProperties, sizeUnit);
+}
+
+export function getRotation(
+  slices: VaseSlice[],
+  height: number,
+  sizeUnit: SizeUnit
+): Vec2[] {
+  const sliceProperties = selectSlices(
+    slices,
+    height,
+    (slice) => slice.rotation
+  );
+  return evaluateSlices(sliceProperties, sizeUnit);
 }
