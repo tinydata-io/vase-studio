@@ -29,6 +29,7 @@ export type VaseSlice = {
   position: number; // position of the slice, expressed as 0-1 in terms of vase height
   radius?: WeightedNumber; // radius of the slice, expressed in sizeUnit
   rotation?: WeightedNumber; // rotation of the slice, expressed in degrees
+  intensity?: WeightedNumber; // intensity of the profile, expressed as 0 (circle) - 1 (full profile)
 };
 
 export type Vase = {

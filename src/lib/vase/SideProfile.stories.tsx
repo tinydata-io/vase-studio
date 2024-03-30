@@ -4,7 +4,7 @@ import { Vec2 } from "@/lib/math2d";
 import { VaseProfile, VaseSlice } from "@/lib/types";
 
 import { Curve } from "@/components/svg";
-import { getRotation, getRadius } from "./slices";
+import { getRotation, getRadius, getIntensity } from "./slices";
 import { SizeUnit } from "../units";
 
 type SideProfileProps = {
@@ -12,7 +12,7 @@ type SideProfileProps = {
   height: number;
   sizeUnit: SizeUnit;
   deconstructor: typeof getRadius;
-  sliceProperty: "radius" | "rotation";
+  sliceProperty: "radius" | "rotation" | "intensity";
 };
 
 const SideProfile = ({
@@ -89,11 +89,13 @@ const SampleSlices = [
     position: 0,
     radius: { value: 3, weightIn: 1, weightOut: 1 },
     rotation: { value: 0 },
+    intensity: { value: 0 },
   },
   {
     position: 0.1,
     radius: { value: 5, weightIn: 1, weightOut: 1 },
     rotation: { value: 1 },
+    intensity: { value: 1 },
   },
   {
     position: 0.4,
@@ -101,6 +103,10 @@ const SampleSlices = [
   },
   {
     position: 0.6,
+  },
+  {
+    position: 0.7,
+    intensity: { value: 1 },
   },
   {
     position: 0.8,
@@ -114,6 +120,7 @@ const SampleSlices = [
     position: 1.0,
     radius: { value: 3, weightIn: 0, weightOut: 1 },
     rotation: { value: 3 },
+    intensity: { value: 0 },
   },
 ];
 
@@ -134,5 +141,15 @@ export const Rotation: Story = {
     height: 10,
     deconstructor: getRotation,
     sliceProperty: "rotation",
+  },
+};
+
+export const Intensity: Story = {
+  args: {
+    slices: SampleSlices,
+    sizeUnit: SizeUnit.Centimeter,
+    height: 10,
+    deconstructor: getIntensity,
+    sliceProperty: "intensity",
   },
 };

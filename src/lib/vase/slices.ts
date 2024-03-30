@@ -8,6 +8,8 @@ import {
 } from "@/lib/math2d";
 import { SidePathOptimisationSettings, SizeUnit } from "@/lib/units";
 
+const epsilon = 0.00001;
+
 type SliceProperty = {
   value: WeightedNumber;
   y: number;
@@ -34,9 +36,13 @@ export function selectSlices(
   return result;
 }
 
+type TransformFunction = (p: Vec2) => Vec2;
+
 export function evaluateSlices(
   sliceProperties: SliceProperty[],
-  sizeUnit: SizeUnit
+  height: number,
+  sizeUnit: SizeUnit,
+  transformFunction: TransformFunction = (p: Vec2) => p
 ): Vec2[] {
   const result = [];
 
@@ -84,10 +90,18 @@ export function evaluateSlices(
         t
       );
 
+      point = transformFunction(point);
+
       const distSqr = distanceSqr(prevPoint, point);
+      const yDist = Math.abs(prevPoint.y - point.y);
 
       // too close to the previous point, skip one point, but preserve the last one
-      if (distSqr <= os.minDistanceSqr) {
+      if (
+        distSqr <= os.minDistanceSqr ||
+        point.y < 0 + epsilon ||
+        point.y > height + epsilon ||
+        yDist < os.minSliceDistance
+      ) {
         if (j !== steps) {
           continue;
         } else {
@@ -119,7 +133,7 @@ export function getRadius(
   sizeUnit: SizeUnit
 ): Vec2[] {
   const sliceProperties = selectSlices(slices, height, (slice) => slice.radius);
-  return evaluateSlices(sliceProperties, sizeUnit);
+  return evaluateSlices(sliceProperties, height, sizeUnit);
 }
 
 export function getRotation(
@@ -132,5 +146,22 @@ export function getRotation(
     height,
     (slice) => slice.rotation
   );
-  return evaluateSlices(sliceProperties, sizeUnit);
+  return evaluateSlices(sliceProperties, height, sizeUnit);
+}
+
+export function getIntensity(
+  slices: VaseSlice[],
+  height: number,
+  sizeUnit: SizeUnit
+): Vec2[] {
+  const clamp = (p: Vec2) => {
+    return { x: Math.min(Math.max(0, p.x), 1), y: p.y };
+  };
+
+  const sliceProperties = selectSlices(
+    slices,
+    height,
+    (slice) => slice.intensity
+  );
+  return evaluateSlices(sliceProperties, height, sizeUnit, clamp);
 }
