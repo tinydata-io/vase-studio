@@ -20,6 +20,17 @@ export const SimpleProfileDemo: Story = {
     colors: DefaultPalette,
     sizeUnit: SizeUnit.Centimeter,
     debugPoints: false,
+    intensity: 1,
+  },
+  argTypes: {
+    intensity: {
+      control: {
+        type: "range",
+        min: 0,
+        max: 1,
+        step: 0.05,
+      },
+    },
   },
   render: ({ ...args }) => {
     const profile = {

@@ -26,6 +26,7 @@ export type SimpleProfileProps = {
   width: number;
   height: number;
   debugPoints?: boolean;
+  intensity?: number;
 };
 
 export const SimpleProfile = ({
@@ -36,6 +37,7 @@ export const SimpleProfile = ({
   height,
   colors,
   debugPoints,
+  intensity,
 }: SimpleProfileProps) => {
   const maxOffset = profile.pointSets.reduce(
     (max, { offset }) => Math.max(max, offset.value),
@@ -44,7 +46,12 @@ export const SimpleProfile = ({
 
   const profileRadius = profileDiameter / 2;
 
-  const generatedProfile = generateProfile(profileRadius, sizeUnit, profile);
+  const generatedProfile = generateProfile(
+    profileRadius,
+    sizeUnit,
+    profile,
+    intensity === undefined ? 1 : intensity
+  );
 
   const drawProps = calculateDrawProps(
     profileRadius,

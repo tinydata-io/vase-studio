@@ -126,6 +126,7 @@ export const generateProfileSectionCurve = (
   profileSectionPoints: ProfilePoint[],
   minSectionAngle: number,
   maxSectionAngle: number,
+  transform: (point: Vec2) => Vec2,
   sizeUnit: SizeUnit
 ): Vec2[] => {
   if (profileSectionPoints.length < 2) {
@@ -232,7 +233,7 @@ export const generateProfileSectionCurve = (
 
     // simplify each segment independently
     const simplifiedSegmentPoints = simplifyProfilePoints(
-      segmentPoints,
+      segmentPoints.map(transform),
       os.minSimplifyArea
     );
 
@@ -259,12 +260,29 @@ export const generateProfileSectionCurve = (
   return points;
 };
 
+const modifyIntensity = (
+  point: Vec2,
+  radius: number,
+  intensity: number
+): Vec2 => {
+  const distance = Math.sqrt(point.x * point.x + point.y * point.y);
+  const offset = distance - radius;
+  const expectedDistance = radius + offset * intensity;
+  const factor = expectedDistance / distance;
+
+  return {
+    x: point.x * factor,
+    y: point.y * factor,
+  };
+};
+
 export const generateProfile = (
   radius: number,
   sizeUnit: SizeUnit,
-  profile: VaseProfile
+  profile: VaseProfile,
+  intensity: number
 ): GeneratedProfile => {
-  const referencePoints: ProfilePoint[] = [];
+  const sourceReferencePoints: ProfilePoint[] = [];
 
   const angleStep = (Math.PI * 2) / profile.sections;
   const angleStart = -angleStep / 2 - Math.PI / 2;
@@ -273,7 +291,7 @@ export const generateProfile = (
   const maxAngle = minAngle + angleStep;
 
   profile.pointSets.forEach((pointSet, index) => {
-    referencePoints.push(
+    sourceReferencePoints.push(
       ...generateSegmentProfilePoints(
         radius,
         minAngle,
@@ -284,16 +302,27 @@ export const generateProfile = (
     );
   });
 
-  sortProfilePoints(referencePoints);
+  sortProfilePoints(sourceReferencePoints);
 
   var startTime = performance.now();
 
+  const intensityTransform = (point: Vec2) =>
+    modifyIntensity(point, radius, intensity);
+
   const curveReferencePoints = generateProfileSectionCurve(
-    referencePoints,
+    sourceReferencePoints,
     minAngle,
     maxAngle,
+    intensityTransform,
     sizeUnit
   );
+
+  const referencePoints = sourceReferencePoints.map((pp) => {
+    return {
+      ...pp,
+      position: intensityTransform(pp.position),
+    };
+  });
 
   var endTime = performance.now();
 
