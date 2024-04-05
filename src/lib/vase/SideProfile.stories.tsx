@@ -7,6 +7,8 @@ import { Curve } from "@/components/svg";
 import { getRotation, getRadius, getIntensity } from "./slices";
 import { SizeUnit } from "../units";
 
+import { SampleVase } from "@/examples/vase";
+
 type SideProfileProps = {
   slices: VaseSlice[];
   height: number;
@@ -84,49 +86,9 @@ const meta: Meta<typeof SideProfile> = {
 export default meta;
 type Story = StoryObj<typeof SideProfile>;
 
-const SampleSlices = [
-  {
-    position: 0,
-    radius: { value: 3, weightIn: 1, weightOut: 1 },
-    rotation: { value: 0 },
-    intensity: { value: 0 },
-  },
-  {
-    position: 0.1,
-    radius: { value: 5, weightIn: 1, weightOut: 1 },
-    rotation: { value: 1 },
-    intensity: { value: 1 },
-  },
-  {
-    position: 0.4,
-    radius: { value: 5, weightIn: 0.5, weightOut: 0 },
-  },
-  {
-    position: 0.6,
-  },
-  {
-    position: 0.7,
-    intensity: { value: 1 },
-  },
-  {
-    position: 0.8,
-    radius: { value: 2 },
-  },
-  {
-    position: 0.9,
-    rotation: { value: 2 },
-  },
-  {
-    position: 1.0,
-    radius: { value: 3, weightIn: 0, weightOut: 1 },
-    rotation: { value: 3 },
-    intensity: { value: 0 },
-  },
-];
-
 export const Radius: Story = {
   args: {
-    slices: SampleSlices,
+    slices: SampleVase.slices,
     sizeUnit: SizeUnit.Centimeter,
     height: 10,
     deconstructor: getRadius,
@@ -136,7 +98,7 @@ export const Radius: Story = {
 
 export const Rotation: Story = {
   args: {
-    slices: SampleSlices,
+    slices: SampleVase.slices,
     sizeUnit: SizeUnit.Centimeter,
     height: 10,
     deconstructor: getRotation,
@@ -146,7 +108,7 @@ export const Rotation: Story = {
 
 export const Intensity: Story = {
   args: {
-    slices: SampleSlices,
+    slices: SampleVase.slices,
     sizeUnit: SizeUnit.Centimeter,
     height: 10,
     deconstructor: getIntensity,

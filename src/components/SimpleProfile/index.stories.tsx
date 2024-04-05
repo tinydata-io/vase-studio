@@ -4,6 +4,8 @@ import { SimpleProfile } from ".";
 import { SizeUnit } from "@/lib/units";
 import { DefaultPalette } from "@/lib/colors";
 
+import { SampleVase } from "@/examples/vase";
+
 const meta: Meta<typeof SimpleProfile> = {
   component: SimpleProfile,
   parameters: { layout: "centered" },
@@ -33,37 +35,7 @@ export const SimpleProfileDemo: Story = {
     },
   },
   render: ({ ...args }) => {
-    const profile = {
-      sections: 4,
-      pointSets: [
-        {
-          offset: {
-            value: 0,
-          },
-          count: 4,
-          angleStart: 0,
-          angleStep: 0.25,
-        },
-        {
-          offset: {
-            value: 0.5,
-            weightIn: 1,
-            weightOut: 1,
-          },
-          count: 4,
-          angleStart: 0.125,
-          angleStep: 0.25,
-        },
-        {
-          offset: {
-            value: -0.25,
-          },
-          count: 2,
-          angleStart: 0.4,
-          angleStep: 0.2,
-        },
-      ],
-    };
+    const profile = SampleVase.profile;
 
     return <SimpleProfile {...args} profile={profile} />;
   },
