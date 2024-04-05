@@ -3,29 +3,88 @@ export enum SizeUnit {
   Inch = "in",
 }
 
-export const minDistanceForUnit = (sizeUnit: SizeUnit): number => {
-  switch (sizeUnit) {
-    case SizeUnit.Centimeter:
-      return 0.05;
-    case SizeUnit.Inch:
-      return 0.001968504; // 0.5 mm
-  }
-};
+const InchInCentimeter = 1 / 2.54;
+const InchInCentimeterSqr = InchInCentimeter * InchInCentimeter;
 
-export const minSimplifyAreaForUnit = (sizeUnit: SizeUnit): number => {
-  switch (sizeUnit) {
-    case SizeUnit.Centimeter:
-      return 0.02 ** 2;
-    case SizeUnit.Inch:
-      return 0.0007874016 ** 2; // 0.2 mm ^ 2
-  }
-};
+class OptimisationSettings {
+  constructor(
+    minDistanceInCentimeters: number,
+    minSimplifyAreaInCentimeters: number
+  ) {
+    this.cm = {
+      minDistance: minDistanceInCentimeters,
+      minDistanceSqr: minDistanceInCentimeters ** 2,
+      minSimplifyArea: minSimplifyAreaInCentimeters,
+    };
 
-export const convertToCentimetersScale = (unit: SizeUnit) => {
-  switch (unit) {
-    case SizeUnit.Centimeter:
-      return 1;
-    case SizeUnit.Inch:
-      return 2.54;
+    const minDistanceInInches = minDistanceInCentimeters * InchInCentimeter;
+    const minSimplefyAreaInInches =
+      minSimplifyAreaInCentimeters * InchInCentimeterSqr;
+
+    this.in = {
+      minDistance: minDistanceInInches,
+      minDistanceSqr: minDistanceInInches ** 2,
+      minSimplifyArea: minSimplefyAreaInInches,
+    };
   }
-};
+
+  "cm": {
+    minDistance: number;
+    minDistanceSqr: number;
+    minSimplifyArea: number;
+  };
+
+  "in": {
+    minDistance: number;
+    minDistanceSqr: number;
+    minSimplifyArea: number;
+  };
+}
+
+class SideOptimisationSettings {
+  constructor(
+    minDistanceInCentimeters: number,
+    minSimplifyAreaInCentimeters: number,
+    minSliceDistanceInCentimeters: number
+  ) {
+    const os = new OptimisationSettings(
+      minDistanceInCentimeters,
+      minSimplifyAreaInCentimeters
+    );
+
+    this.cm = {
+      ...os.cm,
+      minSliceDistance: minSliceDistanceInCentimeters,
+    };
+
+    this.in = {
+      ...os.in,
+      minSliceDistance: minSliceDistanceInCentimeters * InchInCentimeter,
+    };
+  }
+
+  "cm": {
+    minDistance: number;
+    minDistanceSqr: number;
+    minSimplifyArea: number;
+    minSliceDistance: number;
+  };
+
+  "in": {
+    minDistance: number;
+    minDistanceSqr: number;
+    minSimplifyArea: number;
+    minSliceDistance: number;
+  };
+}
+
+export const ProfileOptimisationSettings = new OptimisationSettings(
+  0.05,
+  0.04 ** 2
+);
+
+export const SidePathOptimisationSettings = new SideOptimisationSettings(
+  0.2,
+  0.12 ** 2,
+  0.1
+);

@@ -1,3 +1,5 @@
+import log from "loglevel";
+
 import type { Preview } from "@storybook/react";
 import "../src/app/globals.css";
 
@@ -12,5 +14,7 @@ const preview: Preview = {
     },
   },
 };
+
+log.setLevel("debug");
 
 export default preview;

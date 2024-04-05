@@ -19,6 +19,7 @@ export const SimpleProfileDemo: Story = {
     profileDiameter: 8,
     colors: DefaultPalette,
     sizeUnit: SizeUnit.Centimeter,
+    debugPoints: false,
   },
   render: ({ ...args }) => {
     const profile = {
