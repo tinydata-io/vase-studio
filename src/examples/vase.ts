@@ -46,7 +46,7 @@ export const SampleVase: Vase = {
     {
       position: 0.1,
       radius: { value: 5, weightIn: 1, weightOut: 1 },
-      rotation: { value: 1 },
+      rotation: { value: Math.PI * 0.5 },
       intensity: { value: 1 },
     },
     {
@@ -66,12 +66,12 @@ export const SampleVase: Vase = {
     },
     {
       position: 0.9,
-      rotation: { value: 2 },
+      rotation: { value: Math.PI * 1.0 },
     },
     {
       position: 1.0,
       radius: { value: 3, weightIn: 0, weightOut: 1 },
-      rotation: { value: 3 },
+      rotation: { value: Math.PI * 1.5 },
       intensity: { value: 0 },
     },
   ],

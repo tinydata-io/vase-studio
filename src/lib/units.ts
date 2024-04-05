@@ -15,6 +15,7 @@ class OptimisationSettings {
       minDistance: minDistanceInCentimeters,
       minDistanceSqr: minDistanceInCentimeters ** 2,
       minSimplifyArea: minSimplifyAreaInCentimeters,
+      convertToCentimetersScale: 1,
     };
 
     const minDistanceInInches = minDistanceInCentimeters * InchInCentimeter;
@@ -25,6 +26,7 @@ class OptimisationSettings {
       minDistance: minDistanceInInches,
       minDistanceSqr: minDistanceInInches ** 2,
       minSimplifyArea: minSimplefyAreaInInches,
+      convertToCentimetersScale: InchInCentimeter,
     };
   }
 
@@ -32,12 +34,14 @@ class OptimisationSettings {
     minDistance: number;
     minDistanceSqr: number;
     minSimplifyArea: number;
+    convertToCentimetersScale: number;
   };
 
   "in": {
     minDistance: number;
     minDistanceSqr: number;
     minSimplifyArea: number;
+    convertToCentimetersScale: number;
   };
 }
 
