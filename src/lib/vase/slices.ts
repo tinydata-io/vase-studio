@@ -14,6 +14,7 @@ type SliceProperty = {
   value: WeightedNumber;
   y: number;
 };
+
 type PropertySelector = (slice: VaseSlice) => WeightedNumber | undefined;
 
 export function selectSlices(
