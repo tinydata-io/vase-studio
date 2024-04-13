@@ -96,25 +96,72 @@ export class MeshBuilder {
     let ai = 0;
     let bi = 0;
 
-    while (ai < a.external.length && bi < b.external.length) {
-      if (a.originalAngles[ai] < b.originalAngles[bi]) {
+    // temporary triangle format, will be used for quad identification and mesh optimization
+    type InterimTriangle = {
+      nai: number;
+      nbi: number;
+      a: { s: Vec3[]; i: number };
+      b: { s: Vec3[]; i: number };
+      c: { s: Vec3[]; i: number };
+    };
+
+    const triangles: InterimTriangle[] = [];
+    const lenA = a.external.length;
+    const lenB = b.external.length;
+
+    // iterate over slices twice to build full triangulation, break as soon as the first triangle is found again
+    while (ai < 2 * a.external.length && bi < 2 * b.external.length) {
+      // originalAngle is -PI to PI, on second iteration we need to add 2PI to the angle to be continuous
+      const angleA =
+        a.originalAngles[ai % lenA] + (ai >= lenA ? 2 * Math.PI : 0);
+
+      const angleB =
+        b.originalAngles[bi % lenB] + (bi >= lenB ? 2 * Math.PI : 0);
+
+      const nai = ai % lenA;
+      const nbi = bi % lenB;
+
+      if (
+        triangles.length > 0 &&
+        triangles[0].nai == nai &&
+        triangles[0].nbi == nbi
+      ) {
+        // got back to the first triangle, can safely break
+        break;
+      }
+
+      if (angleA < angleB) {
         if (ai > 0 && bi > 0) {
-          const p1 = a.external[ai];
-          const p2 = b.external[bi - 1];
-          const p3 = a.external[ai - 1];
-          this.addTriangle(p1, p2, p3);
+          triangles.push({
+            nai,
+            nbi,
+            a: { s: a.external, i: ai % lenA },
+            b: { s: b.external, i: (bi - 1) % lenB },
+            c: { s: a.external, i: (ai - 1) % lenA },
+          });
         }
         ai++;
       } else {
         if (ai > 0 && bi > 0) {
-          const p1 = b.external[bi];
-          const p2 = b.external[bi - 1];
-          const p3 = a.external[ai - 1];
-          this.addTriangle(p1, p2, p3);
+          triangles.push({
+            nai,
+            nbi,
+            a: { s: b.external, i: bi % lenB },
+            b: { s: b.external, i: (bi - 1) % lenB },
+            c: { s: a.external, i: (ai - 1) % lenA },
+          });
         }
         bi++;
       }
     }
+
+    triangles.forEach((t) => {
+      const pa = t.a.s[t.a.i];
+      const pb = t.b.s[t.b.i];
+      const pc = t.c.s[t.c.i];
+
+      this.addTriangle(pa, pb, pc);
+    });
   }
 
   triangulateSlices(slices: ModelSlice[]) {

@@ -26,6 +26,14 @@ const findCorrespondingSlices = function (vs: Vec2[], y: number) {
   return [prev, undefined];
 };
 
+const angleDiff = (a: number, b: number): number => {
+  if (a > b) {
+    return angleDiff(b, a);
+  }
+
+  return Math.min(b - a, a + Math.PI * 2 - b);
+};
+
 const interpolate = function (y: number, ps?: Vec2, ns?: Vec2): number {
   if (!ps) {
     return ns!.x;
@@ -55,12 +63,10 @@ export const getVaseModelSlices = (vase: Vase): ModelSlice[] => {
   ys.sort((a, b) => a - b);
 
   let prevY = -1;
+  let prevRotation = 0;
+  let prevRadius = 0;
 
-  for (const y of ys) {
-    if (y === prevY) {
-      continue;
-    }
-
+  const getSliceAttributes = (y: number) => {
     // this could be optimised
     const [prevR, nextR] = findCorrespondingSlices(radiusSlices, y);
     const [prevI, nextI] = findCorrespondingSlices(intensitySlices, y);
@@ -70,6 +76,15 @@ export const getVaseModelSlices = (vase: Vase): ModelSlice[] => {
     const intensity = interpolate(y, prevI, nextI);
     const rotation = interpolate(y, prevRot, nextRot);
 
+    return { radius, intensity, rotation };
+  };
+
+  const addMeshSlice = (
+    y: number,
+    radius: number,
+    intensity: number,
+    rotation: number
+  ) => {
     const profile = generateProfile(
       radius,
       vase.sizeUnit,
@@ -92,8 +107,46 @@ export const getVaseModelSlices = (vase: Vase): ModelSlice[] => {
       external: externalPoints.map((p) => p.p),
       originalAngles: externalPoints.map((p) => p.originalAngle),
     });
+  };
+
+  for (const y of ys) {
+    if (y === prevY) {
+      continue;
+    }
+
+    const { radius, intensity, rotation } = getSliceAttributes(y);
+
+    if (prevY >= 0) {
+      const rotationDiff = angleDiff(prevRotation, rotation);
+      const radialDiff = Math.max(radius, prevRadius) * rotationDiff;
+      const horizontalDiff = y - prevY;
+
+      console.log("radialDiff", radialDiff);
+      console.log("horizontalDiff", horizontalDiff);
+
+      const additionalSlices = Math.ceil((4 * horizontalDiff) / radialDiff);
+
+      const dy = horizontalDiff / (additionalSlices + 1);
+
+      console.log("prevY", prevY);
+
+      for (let i = 1; i <= additionalSlices; i++) {
+        const ay = prevY + i * dy;
+
+        const { radius, intensity, rotation } = getSliceAttributes(ay);
+        addMeshSlice(ay, radius, intensity, rotation);
+
+        console.log("ay", ay);
+      }
+
+      console.log("y", y);
+    }
+
+    addMeshSlice(y, radius, intensity, rotation);
 
     prevY = y;
+    prevRotation = rotation;
+    prevRadius = radius;
   }
 
   return result;

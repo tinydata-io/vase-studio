@@ -4,12 +4,15 @@ import { SizeUnit } from "@/lib/units";
 export enum Example {
   SampleVase = "Sample Vase",
   SquareVase = "Square Vase",
+  BarrelVase = "Barrel Vase",
 }
 
 export const getExample = (model: Example): Vase => {
   switch (model) {
     case Example.SquareVase:
       return squareVase;
+    case Example.BarrelVase:
+      return barrelVase;
     case Example.SampleVase:
     default:
       return sampleVase;
@@ -120,7 +123,44 @@ const squareVase: Vase = {
     {
       position: 1,
       radius: { value: 3, weightIn: 1, weightOut: 1 },
-      rotation: { value: Math.PI / 2, weightIn: 1, weightOut: 1 },
+      rotation: { value: -Math.PI / 2, weightIn: 1, weightOut: 1 },
+      intensity: { value: 0, weightIn: 1, weightOut: 1 },
+    },
+  ],
+};
+
+const barrelVase: Vase = {
+  height: 10,
+  sizeUnit: SizeUnit.Centimeter,
+  thickness: 0,
+  profile: {
+    sections: 8,
+    pointSets: [
+      {
+        offset: {
+          value: 0,
+        },
+        count: 4,
+        angleStart: 0,
+        angleStep: 0.25,
+      },
+    ],
+  },
+  slices: [
+    {
+      position: 0,
+      radius: { value: 3 },
+      rotation: { value: 0, weightIn: 1, weightOut: 1 },
+      intensity: { value: 0, weightIn: 1, weightOut: 1 },
+    },
+    {
+      position: 0.5,
+      radius: { value: 4 },
+    },
+    {
+      position: 1,
+      radius: { value: 3 },
+      rotation: { value: -Math.PI / 2, weightIn: 1, weightOut: 1 },
       intensity: { value: 0, weightIn: 1, weightOut: 1 },
     },
   ],
