@@ -14,6 +14,8 @@ import { BlendFunction, Resolution, KernelSize } from "postprocessing";
 import { useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 
+import { Stats, OrbitControls } from "@react-three/drei";
+
 import { Mesh, TriangleWithNormal, Vec3 } from "@/lib/vase/meshBuilder";
 
 export type MeshPreviewProps = {
@@ -24,6 +26,8 @@ export type MeshPreviewProps = {
   showModel: boolean;
   showWireframe?: boolean;
   showNormals?: boolean;
+  orbitControls?: boolean;
+  showStats?: boolean;
 };
 
 export const MeshPreview = ({
@@ -34,11 +38,13 @@ export const MeshPreview = ({
   showModel,
   showWireframe,
   showNormals,
+  orbitControls,
+  showStats,
 }: MeshPreviewProps) => {
   // border is temporary to show the size of the canvas
   return (
     <div className="border-dashed border-gray-300 border-2 h-full aspect-square">
-      <Canvas shadows>
+      <Canvas shadows frameloop="demand">
         <ambientLight intensity={Math.PI / 2} />
 
         <VaseComponent
@@ -52,6 +58,8 @@ export const MeshPreview = ({
         />
 
         <fog attach="fog" color="white" near={30} far={40} />
+        {orbitControls && <OrbitControls />}
+        {showStats && <Stats />}
       </Canvas>
     </div>
   );
@@ -125,16 +133,14 @@ const VaseComponent = ({
 
   const lightRef = useRef<THREE.DirectionalLight>(null!);
 
-  const state = useThree(({ camera, clock, invalidate }) => {
-    camera.position.x = cameraPosition.x;
-    camera.position.y = cameraPosition.y;
-    camera.position.z = cameraPosition.z;
+  useThree((state) => {
+    state.camera.position.x = cameraPosition.x;
+    state.camera.position.y = cameraPosition.y;
+    state.camera.position.z = cameraPosition.z;
 
-    camera.lookAt(
+    state.camera.lookAt(
       new THREE.Vector3(cameraLookAt.x, cameraLookAt.y, cameraLookAt.z)
     );
-
-    return { clock, invalidate };
   });
 
   useEffect(() => {
@@ -206,20 +212,10 @@ const VaseComponent = ({
           </mesh>
         )}
         <EffectComposer autoClear={false} multisampling={0}>
-          <Outline
-            blendFunction={BlendFunction.ALPHA} // set this to BlendFunction.ALPHA for dark outlines
-            edgeStrength={8} // the edge strength
-            visibleEdgeColor={0x000000} // the color of visible edges
-            hiddenEdgeColor={0xff0000} // the color of hidden edges
-            width={Resolution.AUTO_SIZE} // render width
-            height={Resolution.AUTO_SIZE} // render height
-            kernelSize={KernelSize.VERY_SMALL} // blur kernel size
-            blur={true} // whether the outline should be blurred
-          />
           <Noise
             premultiply // enables or disables noise premultiplication
             blendFunction={BlendFunction.ADD} // blend mode
-            opacity={0.2} // noise opacity level
+            opacity={0.5} // noise opacity level
           />
         </EffectComposer>
       </Selection>

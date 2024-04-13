@@ -10,7 +10,10 @@ type MeshPreviewStoryProps = MeshPreviewProps & { example: Example };
 
 const meta: Meta<MeshPreviewStoryProps> = {
   component: MeshPreview,
-  parameters: { layout: "full", controls: { exclude: ["mesh"] } },
+  parameters: {
+    layout: "full",
+    controls: { exclude: ["mesh", "orbitControls", "showStats"] },
+  },
 };
 
 export default meta;
@@ -25,6 +28,8 @@ export const VasePreviewSample: Story = {
     showModel: true,
     showWireframe: false,
     showNormals: false,
+    orbitControls: true,
+    showStats: true,
   },
   argTypes: {
     example: {
