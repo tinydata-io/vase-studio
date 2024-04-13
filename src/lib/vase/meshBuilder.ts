@@ -42,10 +42,18 @@ export const getTriangleNormal = (t: Triangle): Vec3 => {
   const [ax, ay, az] = [t.b.x - t.a.x, t.b.y - t.a.y, t.b.z - t.a.z];
   const [bx, by, bz] = [t.c.x - t.a.x, t.c.y - t.a.y, t.c.z - t.a.z];
 
-  return {
+  const v = {
     x: ay * bz - az * by,
     y: az * bx - ax * bz,
     z: ax * by - ay * bx,
+  };
+
+  const length = Math.sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
+
+  return {
+    x: v.x / length,
+    y: v.y / length,
+    z: v.z / length,
   };
 };
 
@@ -125,9 +133,6 @@ export class MeshBuilder {
 
     for (let i = 1; i < transformedSlices.length; i++) {
       this.connectSlices(transformedSlices[i - 1], transformedSlices[i]);
-      if (i > 4) {
-        break;
-      }
     }
   }
 

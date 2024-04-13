@@ -16,11 +16,12 @@ import * as THREE from "three";
 
 import { Mesh, TriangleWithNormal, Vec3 } from "@/lib/vase/meshBuilder";
 
-type MeshPreviewProps = {
+export type MeshPreviewProps = {
   mesh: Mesh;
   cameraPosition: Vec3;
   cameraLookAt: Vec3;
   meshRotation: number;
+  showModel: boolean;
   showWireframe?: boolean;
   showNormals?: boolean;
 };
@@ -30,6 +31,7 @@ export const MeshPreview = ({
   cameraPosition,
   cameraLookAt,
   meshRotation,
+  showModel,
   showWireframe,
   showNormals,
 }: MeshPreviewProps) => {
@@ -44,6 +46,7 @@ export const MeshPreview = ({
           cameraPosition={cameraPosition}
           cameraLookAt={cameraLookAt}
           meshRotation={meshRotation}
+          showModel={showModel}
           showWireframe={showWireframe}
           showNormals={showNormals}
         />
@@ -59,6 +62,7 @@ type VaseProps = {
   cameraPosition: Vec3;
   cameraLookAt: Vec3;
   meshRotation: number;
+  showModel: boolean;
   showWireframe?: boolean;
   showNormals?: boolean;
 };
@@ -113,6 +117,7 @@ const VaseComponent = ({
   cameraPosition,
   cameraLookAt,
   meshRotation,
+  showModel,
   showWireframe,
 }: VaseProps) => {
   const mainMeshRef = useRef<THREE.Mesh>(null!);
@@ -154,7 +159,7 @@ const VaseComponent = ({
 
     meshRefs.forEach((meshRef) => {
       if (meshRef.current) {
-        meshRef.current.rotation.y = meshRotation * 0.2;
+        meshRef.current.rotation.y = meshRotation;
       }
     });
   }, [mainMeshRef, wireframeMeshRef, meshRotation]);
@@ -169,14 +174,16 @@ const VaseComponent = ({
       />
       <Selection enabled={true}>
         <Select enabled={true}>
-          <mesh
-            ref={mainMeshRef}
-            position={[0, 0, 0]}
-            geometry={geometry}
-            castShadow
-          >
-            <meshPhysicalMaterial color="#4682b4" side={THREE.DoubleSide} />
-          </mesh>
+          {showModel && (
+            <mesh
+              ref={mainMeshRef}
+              position={[0, 0, 0]}
+              geometry={geometry}
+              castShadow
+            >
+              <meshPhysicalMaterial color="#4682b4" side={THREE.DoubleSide} />
+            </mesh>
+          )}
         </Select>
         <mesh position={[0, -0.1, 0]} rotation-x={-Math.PI / 2} receiveShadow>
           <circleGeometry args={[100]} />
@@ -193,7 +200,7 @@ const VaseComponent = ({
               wireframe={true}
               side={THREE.DoubleSide}
               transparent={true}
-              opacity={0.5}
+              opacity={1.0}
               depthWrite={false}
             />
           </mesh>
