@@ -1,23 +1,21 @@
 import type { Meta, StoryObj } from "@storybook/react";
 
 import { Vec2 } from "@/lib/math2d";
-import { VaseProfile, VaseSlice } from "@/lib/types";
+import { VaseSlice } from "@/lib/types";
+import { SizeUnit } from "@/lib/units";
 
 import { Curve } from "@/components/svg";
-import { getRotation, getRadius, getIntensity } from "./slices";
-import { SizeUnit } from "../units";
+import { Deconstructor } from "@/lib/vase/slices";
 
-import { SampleVase } from "@/examples/vase";
-
-type SideProfileProps = {
+export type SideProfileProps = {
   slices: VaseSlice[];
   height: number;
   sizeUnit: SizeUnit;
-  deconstructor: typeof getRadius;
+  deconstructor: Deconstructor;
   sliceProperty: "radius" | "rotation" | "intensity";
 };
 
-const SideProfile = ({
+export const SideProfile = ({
   slices,
   height,
   sizeUnit,
@@ -76,42 +74,4 @@ const SideProfile = ({
       />
     </svg>
   );
-};
-
-const meta: Meta<typeof SideProfile> = {
-  component: SideProfile,
-  parameters: { layout: "centered" },
-};
-
-export default meta;
-type Story = StoryObj<typeof SideProfile>;
-
-export const Radius: Story = {
-  args: {
-    slices: SampleVase.slices,
-    sizeUnit: SizeUnit.Centimeter,
-    height: 10,
-    deconstructor: getRadius,
-    sliceProperty: "radius",
-  },
-};
-
-export const Rotation: Story = {
-  args: {
-    slices: SampleVase.slices,
-    sizeUnit: SizeUnit.Centimeter,
-    height: 10,
-    deconstructor: getRotation,
-    sliceProperty: "rotation",
-  },
-};
-
-export const Intensity: Story = {
-  args: {
-    slices: SampleVase.slices,
-    sizeUnit: SizeUnit.Centimeter,
-    height: 10,
-    deconstructor: getIntensity,
-    sliceProperty: "intensity",
-  },
 };

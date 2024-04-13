@@ -129,8 +129,12 @@ export const generateProfileSectionCurve = (
   transform: (point: Vec2) => Vec2,
   sizeUnit: SizeUnit
 ): Vec2[] => {
-  if (profileSectionPoints.length < 2) {
+  if (profileSectionPoints.length < 1) {
     return [];
+  }
+
+  if (profileSectionPoints.length === 1) {
+    return [transform(profileSectionPoints[0].position)];
   }
 
   const sectionAngle = maxSectionAngle - minSectionAngle;

@@ -128,6 +128,12 @@ export function evaluateSlices(
   return result;
 }
 
+export type Deconstructor = (
+  slices: VaseSlice[],
+  height: number,
+  sizeUnit: SizeUnit
+) => Vec2[];
+
 export function getRadius(
   slices: VaseSlice[],
   height: number,

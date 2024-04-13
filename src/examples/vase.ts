@@ -1,7 +1,22 @@
 import { Vase } from "@/lib/types";
 import { SizeUnit } from "@/lib/units";
 
-export const SampleVase: Vase = {
+export enum Example {
+  SampleVase = "Sample Vase",
+  SquareVase = "Square Vase",
+}
+
+export const getExample = (model: Example): Vase => {
+  switch (model) {
+    case Example.SquareVase:
+      return squareVase;
+    case Example.SampleVase:
+    default:
+      return sampleVase;
+  }
+};
+
+const sampleVase: Vase = {
   height: 10,
   sizeUnit: SizeUnit.Centimeter,
   thickness: 0,
@@ -46,7 +61,7 @@ export const SampleVase: Vase = {
     {
       position: 0.1,
       radius: { value: 5, weightIn: 1, weightOut: 1 },
-      rotation: { value: Math.PI * 0.5 },
+      rotation: { value: 0 },
       intensity: { value: 1 },
     },
     {
@@ -55,6 +70,7 @@ export const SampleVase: Vase = {
     },
     {
       position: 0.6,
+      rotation: { value: Math.PI / 2 },
     },
     {
       position: 0.7,
@@ -73,6 +89,39 @@ export const SampleVase: Vase = {
       radius: { value: 3, weightIn: 0, weightOut: 1 },
       rotation: { value: Math.PI * 1.5 },
       intensity: { value: 0 },
+    },
+  ],
+};
+
+const squareVase: Vase = {
+  height: 10,
+  sizeUnit: SizeUnit.Centimeter,
+  thickness: 0,
+  profile: {
+    sections: 4,
+    pointSets: [
+      {
+        offset: {
+          value: 0,
+        },
+        count: 1,
+        angleStart: 0,
+        angleStep: 1,
+      },
+    ],
+  },
+  slices: [
+    {
+      position: 0,
+      radius: { value: 3, weightIn: 1, weightOut: 1 },
+      rotation: { value: 0, weightIn: 1, weightOut: 1 },
+      intensity: { value: 0, weightIn: 1, weightOut: 1 },
+    },
+    {
+      position: 1,
+      radius: { value: 3, weightIn: 1, weightOut: 1 },
+      rotation: { value: Math.PI / 2, weightIn: 1, weightOut: 1 },
+      intensity: { value: 0, weightIn: 1, weightOut: 1 },
     },
   ],
 };
