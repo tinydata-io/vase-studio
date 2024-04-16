@@ -6,9 +6,7 @@ import { getExample, Example } from "@/examples/vase";
 import { getVaseModelSlices } from "@/lib/vase/vase";
 import { MeshBuilder } from "@/lib/vase/meshBuilder";
 
-type MeshPreviewStoryProps = MeshPreviewProps & { example: Example };
-
-const meta: Meta<MeshPreviewStoryProps> = {
+const meta: Meta<typeof MeshPreview> = {
   component: MeshPreview,
   parameters: {
     layout: "full",
@@ -17,11 +15,10 @@ const meta: Meta<MeshPreviewStoryProps> = {
 };
 
 export default meta;
-type Story = StoryObj<MeshPreviewStoryProps>;
+type Story = StoryObj<typeof MeshPreview>;
 
 export const VasePreviewSample: Story = {
   args: {
-    example: Example.SampleVase,
     cameraPosition: { x: 0, y: 8, z: -10 },
     cameraLookAt: { x: 0, y: 0, z: 0 },
     meshRotation: 0,
@@ -32,10 +29,6 @@ export const VasePreviewSample: Story = {
     showStats: true,
   },
   argTypes: {
-    example: {
-      control: "select",
-      options: Object.values(Example),
-    },
     meshRotation: {
       control: {
         type: "range",
@@ -45,7 +38,7 @@ export const VasePreviewSample: Story = {
       },
     },
   },
-  render: ({ example, ...args }) => {
+  render: (args, { globals: { example } }) => {
     const vase = getExample(example);
     const modelSlices = getVaseModelSlices(vase);
 

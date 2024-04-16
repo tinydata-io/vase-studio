@@ -1,14 +1,12 @@
 import type { Meta, StoryObj } from "@storybook/react";
 
-import { SimpleProfile, SimpleProfileProps } from ".";
+import { SimpleProfile } from ".";
 import { SizeUnit } from "@/lib/units";
 import { DefaultPalette } from "@/lib/colors";
 
-import { getExample, Example } from "@/examples/vase";
+import { getExample } from "@/examples/vase";
 
-type SimpleProfileStoryProps = SimpleProfileProps & { example: Example };
-
-const meta: Meta<SimpleProfileStoryProps> = {
+const meta: Meta<typeof SimpleProfile> = {
   component: SimpleProfile,
   parameters: {
     layout: "centered",
@@ -17,11 +15,10 @@ const meta: Meta<SimpleProfileStoryProps> = {
 };
 
 export default meta;
-type Story = StoryObj<SimpleProfileStoryProps>;
+type Story = StoryObj<typeof SimpleProfile>;
 
 export const SimpleProfileDemo: Story = {
   args: {
-    example: Example.SampleVase,
     width: 512,
     height: 512,
     profileDiameter: 8,
@@ -31,10 +28,6 @@ export const SimpleProfileDemo: Story = {
     intensity: 1,
   },
   argTypes: {
-    example: {
-      control: "select",
-      options: Object.values(Example),
-    },
     profileDiameter: {
       control: {
         type: "range",
@@ -52,9 +45,9 @@ export const SimpleProfileDemo: Story = {
       },
     },
   },
-  render: ({ ...args }) => {
-    const example = getExample(args.example as Example);
-    const profile = example.profile;
+  render: (args, { globals: { example } }) => {
+    const vase = getExample(example);
+    const profile = vase.profile;
 
     return <SimpleProfile {...args} profile={profile} />;
   },
