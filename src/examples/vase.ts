@@ -74,14 +74,12 @@ const sampleVase: Vase = {
     {
       position: 0.6,
       rotation: { value: Math.PI / 2 },
-    },
-    {
-      position: 0.7,
       intensity: { value: 1 },
     },
     {
       position: 0.8,
       radius: { value: 2 },
+      intensity: { value: 0.1 },
     },
     {
       position: 0.9,

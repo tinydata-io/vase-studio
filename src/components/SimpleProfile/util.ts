@@ -121,11 +121,44 @@ export const sortCurvePoints = (curvePoints: Vec2[]) => {
   return pointsWithAngles.map((point) => point.point);
 };
 
-const splitLongSegments = (curvePoints: Vec2[], sizeUnit: SizeUnit): Vec2[] => {
-  const result: Vec2[] = [];
+// calculate number of subdivisions for long segments, will be
+// applied during mesh generation, after scaling the profile
+const longSegmentSubdivisions = (
+  curvePoints: Vec2[],
+  sizeUnit: SizeUnit
+): number[] => {
+  const result: number[] = [];
 
-  const maxDist = 0.5; // TODO
+  const os = ProfileOptimisationSettings[sizeUnit];
+
+  const maxDist = os.maxSegmentLength;
   const maxDistSqr = maxDist * maxDist;
+
+  for (let i = 0; i < curvePoints.length; i++) {
+    const currPoint = curvePoints[i];
+    const nextPoint = curvePoints[(i + 1) % curvePoints.length];
+
+    const distSqr = distanceSqr(currPoint, nextPoint);
+
+    if (distSqr > maxDistSqr) {
+      const steps = Math.ceil(Math.sqrt(distSqr) / maxDist);
+
+      console.log("dist:", Math.sqrt(distSqr), "steps:", steps);
+
+      result.push(steps);
+    } else {
+      result.push(0);
+    }
+  }
+
+  return result;
+};
+
+export const splitLongSegments = (
+  curvePoints: Vec2[],
+  subdivisions: number[]
+): Vec2[] => {
+  const result: Vec2[] = [];
 
   for (let i = 0; i < curvePoints.length; i++) {
     const currPoint = curvePoints[i];
@@ -133,20 +166,19 @@ const splitLongSegments = (curvePoints: Vec2[], sizeUnit: SizeUnit): Vec2[] => {
 
     result.push(currPoint);
 
-    const distSqr = distanceSqr(currPoint, nextPoint);
+    const steps = subdivisions[i];
 
-    if (distSqr > maxDistSqr) {
-      const steps = Math.ceil(Math.sqrt(distSqr) / maxDist);
+    if (steps > 1) {
       const step = 1 / steps;
 
-      console.log("dist", Math.sqrt(distSqr));
-      console.log("steps", steps);
+      const dx = nextPoint.x - currPoint.x;
+      const dy = nextPoint.y - currPoint.y;
 
       for (let j = 1; j < steps; j++) {
         const t = j * step;
         const point = {
-          x: currPoint.x + (nextPoint.x - currPoint.x) * t,
-          y: currPoint.y + (nextPoint.y - currPoint.y) * t,
+          x: currPoint.x + dx * t,
+          y: currPoint.y + dy * t,
         };
 
         result.push(point);
@@ -162,7 +194,6 @@ export const generateProfileSectionCurve = (
   profileSectionPoints: ProfilePoint[],
   minSectionAngle: number,
   maxSectionAngle: number,
-  transform: (point: Vec2) => Vec2,
   sizeUnit: SizeUnit
 ): Vec2[] => {
   if (profileSectionPoints.length < 1) {
@@ -170,7 +201,7 @@ export const generateProfileSectionCurve = (
   }
 
   if (profileSectionPoints.length === 1) {
-    return [transform(profileSectionPoints[0].position)];
+    return [profileSectionPoints[0].position];
   }
 
   const sectionAngle = maxSectionAngle - minSectionAngle;
@@ -273,7 +304,7 @@ export const generateProfileSectionCurve = (
 
     // simplify each segment independently
     const simplifiedSegmentPoints = simplifyProfilePoints(
-      segmentPoints.map(transform),
+      segmentPoints,
       os.minSimplifyArea
     );
 
@@ -300,14 +331,15 @@ export const generateProfileSectionCurve = (
   return points;
 };
 
-const modifyIntensity = (
+export const modifyProfilePoint = (
   point: Vec2,
-  radius: number,
+  srcRadius: number,
+  dstRadius: number,
   intensity: number
 ): Vec2 => {
   const distance = Math.sqrt(point.x * point.x + point.y * point.y);
-  const offset = distance - radius;
-  const expectedDistance = radius + offset * intensity;
+  const offset = distance - srcRadius;
+  const expectedDistance = dstRadius + offset * intensity;
   const factor = expectedDistance / distance;
 
   return {
@@ -319,10 +351,9 @@ const modifyIntensity = (
 export const generateProfile = (
   radius: number,
   sizeUnit: SizeUnit,
-  profile: VaseProfile,
-  intensity: number
+  profile: VaseProfile
 ): GeneratedProfile => {
-  const sourceReferencePoints: ProfilePoint[] = [];
+  const referencePoints: ProfilePoint[] = [];
 
   const angleStep = (Math.PI * 2) / profile.sections;
   const angleStart = -angleStep / 2 - Math.PI / 2;
@@ -331,7 +362,7 @@ export const generateProfile = (
   const maxAngle = minAngle + angleStep;
 
   profile.pointSets.forEach((pointSet, index) => {
-    sourceReferencePoints.push(
+    referencePoints.push(
       ...generateSegmentProfilePoints(
         radius,
         minAngle,
@@ -342,27 +373,16 @@ export const generateProfile = (
     );
   });
 
-  sortProfilePoints(sourceReferencePoints);
+  sortProfilePoints(referencePoints);
 
   var startTime = performance.now();
 
-  const intensityTransform = (point: Vec2) =>
-    modifyIntensity(point, radius, intensity);
-
   const curveReferencePoints = generateProfileSectionCurve(
-    sourceReferencePoints,
+    referencePoints,
     minAngle,
     maxAngle,
-    intensityTransform,
     sizeUnit
   );
-
-  const referencePoints = sourceReferencePoints.map((pp) => {
-    return {
-      ...pp,
-      position: intensityTransform(pp.position),
-    };
-  });
 
   var endTime = performance.now();
 
@@ -392,14 +412,15 @@ export const generateProfile = (
   sortProfilePoints(points);
   sortCurvePoints(curvePoints);
 
-  const resultCurvePoints = splitLongSegments(curvePoints, sizeUnit);
+  const subdivisions = longSegmentSubdivisions(curvePoints, sizeUnit);
 
-  log.debug("totalPoints", resultCurvePoints.length);
+  log.debug("totalPoints", curvePoints.length);
 
   return {
     referencePoints: referencePoints,
     controlPoints: points,
-    curvePoints: resultCurvePoints,
+    curvePoints: curvePoints,
+    subdivisions: subdivisions,
     sections: profile.sections,
     angleStart: angleStart,
     angleStep: angleStep,

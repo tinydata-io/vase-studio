@@ -2,12 +2,15 @@ import { Vase } from "@/lib/types";
 import { Vec2, rotate } from "@/lib/math2d";
 
 import { getRotation, getRadius, getIntensity } from "@/lib/vase/slices";
-import { generateProfile } from "@/components/SimpleProfile/util";
+import {
+  generateProfile,
+  modifyProfilePoint,
+  splitLongSegments,
+} from "@/components/SimpleProfile/util";
 
 export type ModelSlice = {
   y: number;
   external: Vec2[];
-  originalAngles: number[];
 };
 
 const findCorrespondingSlices = function (vs: Vec2[], y: number) {
@@ -54,6 +57,13 @@ export const getVaseModelSlices = (vase: Vase): ModelSlice[] => {
   const radiusSlices = getRadius(vase.slices, vase.height, vase.sizeUnit);
   const intensitySlices = getIntensity(vase.slices, vase.height, vase.sizeUnit);
 
+  const referenceRadius = Math.max(...radiusSlices.map((s) => s.x));
+  const referenceProfile = generateProfile(
+    referenceRadius,
+    vase.sizeUnit,
+    vase.profile
+  );
+
   let ys = [
     ...rotationSlices.map((s) => s.y),
     ...radiusSlices.map((s) => s.y),
@@ -85,27 +95,29 @@ export const getVaseModelSlices = (vase: Vase): ModelSlice[] => {
     intensity: number,
     rotation: number
   ) => {
-    const profile = generateProfile(
-      radius,
-      vase.sizeUnit,
-      vase.profile,
-      intensity
-    );
-
     const cosAngle = Math.cos(rotation);
     const sinAngle = Math.sin(rotation);
 
-    let externalPoints = profile.curvePoints.map((p) => ({
-      p: rotate(p, cosAngle, sinAngle),
-      originalAngle: Math.atan2(p.y, p.x),
-    }));
+    console.log(
+      `addMeshSlice y=${y} referenceRadius=${referenceRadius} radius=${radius} intensity=${intensity} rotation=${rotation}`
+    );
 
-    externalPoints.sort((a, b) => a.originalAngle - b.originalAngle);
+    let externalPoints = referenceProfile.curvePoints.map((p) => {
+      return modifyProfilePoint(p, referenceRadius, radius, intensity);
+    });
+
+    externalPoints = splitLongSegments(
+      externalPoints,
+      referenceProfile.subdivisions
+    );
+
+    externalPoints = externalPoints.map((p) => {
+      return rotate(p, cosAngle, sinAngle);
+    });
 
     result.push({
       y: y,
-      external: externalPoints.map((p) => p.p),
-      originalAngles: externalPoints.map((p) => p.originalAngle),
+      external: externalPoints,
     });
   };
 

@@ -92,94 +92,44 @@ export class MeshBuilder {
     }
   }
 
-  connectSlices(a: TransformedSlice, b: TransformedSlice) {
-    let ai = 0;
-    let bi = 0;
+  connectSlices(a: Vec3[], b: Vec3[]) {
+    for (let i = 0; i < a.length; i++) {
+      const sa = a[i];
+      const sb = a[(i + 1) % a.length];
 
-    // temporary triangle format, will be used for quad identification and mesh optimization
-    type InterimTriangle = {
-      nai: number;
-      nbi: number;
-      a: { s: Vec3[]; i: number };
-      b: { s: Vec3[]; i: number };
-      c: { s: Vec3[]; i: number };
-    };
+      const sc = b[i];
+      const sd = b[(i + 1) % b.length];
 
-    const triangles: InterimTriangle[] = [];
-    const lenA = a.external.length;
-    const lenB = b.external.length;
+      // quad center
+      const se = {
+        x: (sa.x + sb.x + sc.x + sd.x) / 4,
+        y: (sa.y + sb.y + sc.y + sd.y) / 4,
+        z: (sa.z + sb.z + sc.z + sd.z) / 4,
+      };
 
-    // iterate over slices twice to build full triangulation, break as soon as the first triangle is found again
-    while (ai < 2 * a.external.length && bi < 2 * b.external.length) {
-      // originalAngle is -PI to PI, on second iteration we need to add 2PI to the angle to be continuous
-      const angleA =
-        a.originalAngles[ai % lenA] + (ai >= lenA ? 2 * Math.PI : 0);
-
-      const angleB =
-        b.originalAngles[bi % lenB] + (bi >= lenB ? 2 * Math.PI : 0);
-
-      const nai = ai % lenA;
-      const nbi = bi % lenB;
-
-      if (
-        triangles.length > 0 &&
-        triangles[0].nai == nai &&
-        triangles[0].nbi == nbi
-      ) {
-        // got back to the first triangle, can safely break
-        break;
-      }
-
-      if (angleA < angleB) {
-        if (ai > 0 && bi > 0) {
-          triangles.push({
-            nai,
-            nbi,
-            a: { s: a.external, i: ai % lenA },
-            b: { s: b.external, i: (bi - 1) % lenB },
-            c: { s: a.external, i: (ai - 1) % lenA },
-          });
-        }
-        ai++;
-      } else {
-        if (ai > 0 && bi > 0) {
-          triangles.push({
-            nai,
-            nbi,
-            a: { s: b.external, i: bi % lenB },
-            b: { s: b.external, i: (bi - 1) % lenB },
-            c: { s: a.external, i: (ai - 1) % lenA },
-          });
-        }
-        bi++;
-      }
+      this.addTriangle(sa, sb, se);
+      this.addTriangle(sb, sd, se);
+      this.addTriangle(sd, sc, se);
+      this.addTriangle(sc, sa, se);
     }
-
-    triangles.forEach((t) => {
-      const pa = t.a.s[t.a.i];
-      const pb = t.b.s[t.b.i];
-      const pc = t.c.s[t.c.i];
-
-      this.addTriangle(pa, pb, pc);
-    });
   }
 
   triangulateSlices(slices: ModelSlice[]) {
     const transformedSlices = slices.map((slice) => {
-      const external = slice.external.map((p) => ({
+      return slice.external.map((p) => ({
         x: p.x,
-        y: slice.y, // temporary
+        y: slice.y,
         z: p.y,
       }));
-
-      return {
-        external,
-        originalAngles: slice.originalAngles,
-      };
     });
 
+    let prevTransformedSlice = transformedSlices[0];
+
     for (let i = 1; i < transformedSlices.length; i++) {
-      this.connectSlices(transformedSlices[i - 1], transformedSlices[i]);
+      const transformedSlice = transformedSlices[i];
+      this.connectSlices(prevTransformedSlice, transformedSlice);
+
+      prevTransformedSlice = transformedSlice;
     }
   }
 
