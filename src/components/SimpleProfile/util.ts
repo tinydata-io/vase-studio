@@ -143,8 +143,6 @@ const longSegmentSubdivisions = (
     if (distSqr > maxDistSqr) {
       const steps = Math.ceil(Math.sqrt(distSqr) / maxDist);
 
-      console.log("dist:", Math.sqrt(distSqr), "steps:", steps);
-
       result.push(steps);
     } else {
       result.push(0);

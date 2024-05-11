@@ -67,11 +67,18 @@ export class Mesh {
   }
 }
 
+export enum TrianglesPerQuad {
+  Two = "Two",
+  Four = "Four",
+}
+
 export class MeshBuilder {
   triangles: Triangle[];
+  trianglesPerQuad: TrianglesPerQuad;
 
-  constructor() {
+  constructor(trianglesPerQuad: TrianglesPerQuad = TrianglesPerQuad.Two) {
     this.triangles = [];
+    this.trianglesPerQuad = trianglesPerQuad;
   }
 
   addTriangle(a: Vec3, b: Vec3, c: Vec3) {
@@ -100,17 +107,22 @@ export class MeshBuilder {
       const sc = b[i];
       const sd = b[(i + 1) % b.length];
 
-      // quad center
-      const se = {
-        x: (sa.x + sb.x + sc.x + sd.x) / 4,
-        y: (sa.y + sb.y + sc.y + sd.y) / 4,
-        z: (sa.z + sb.z + sc.z + sd.z) / 4,
-      };
+      if (this.trianglesPerQuad === TrianglesPerQuad.Four) {
+        // quad center
+        const se = {
+          x: (sa.x + sb.x + sc.x + sd.x) / 4,
+          y: (sa.y + sb.y + sc.y + sd.y) / 4,
+          z: (sa.z + sb.z + sc.z + sd.z) / 4,
+        };
 
-      this.addTriangle(sa, sb, se);
-      this.addTriangle(sb, sd, se);
-      this.addTriangle(sd, sc, se);
-      this.addTriangle(sc, sa, se);
+        this.addTriangle(sa, sb, se);
+        this.addTriangle(sb, sd, se);
+        this.addTriangle(sd, sc, se);
+        this.addTriangle(sc, sa, se);
+      } else {
+        this.addTriangle(sa, sb, sc);
+        this.addTriangle(sc, sd, sb);
+      }
     }
   }
 

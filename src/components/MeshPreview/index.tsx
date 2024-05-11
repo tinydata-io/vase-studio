@@ -3,7 +3,6 @@
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import {
   EffectComposer,
-  Outline,
   Selection,
   Select,
   Noise,
@@ -22,7 +21,6 @@ export type MeshPreviewProps = {
   mesh: Mesh;
   cameraPosition: Vec3;
   cameraLookAt: Vec3;
-  meshRotation: number;
   showModel: boolean;
   showWireframe?: boolean;
   showNormals?: boolean;
@@ -34,7 +32,6 @@ export const MeshPreview = ({
   mesh,
   cameraPosition,
   cameraLookAt,
-  meshRotation,
   showModel,
   showWireframe,
   showNormals,
@@ -51,7 +48,6 @@ export const MeshPreview = ({
           mesh={mesh}
           cameraPosition={cameraPosition}
           cameraLookAt={cameraLookAt}
-          meshRotation={meshRotation}
           showModel={showModel}
           showWireframe={showWireframe}
           showNormals={showNormals}
@@ -69,7 +65,6 @@ type VaseProps = {
   mesh: Mesh;
   cameraPosition: Vec3;
   cameraLookAt: Vec3;
-  meshRotation: number;
   showModel: boolean;
   showWireframe?: boolean;
   showNormals?: boolean;
@@ -124,7 +119,6 @@ const VaseComponent = ({
   mesh,
   cameraPosition,
   cameraLookAt,
-  meshRotation,
   showModel,
   showWireframe,
 }: VaseProps) => {
@@ -159,16 +153,6 @@ const VaseComponent = ({
   }, [lightRef]);
 
   const geometry = useMemo(() => buildGeometry(mesh), [mesh]);
-
-  useEffect(() => {
-    const meshRefs = [mainMeshRef, wireframeMeshRef];
-
-    meshRefs.forEach((meshRef) => {
-      if (meshRef.current) {
-        meshRef.current.rotation.y = meshRotation;
-      }
-    });
-  }, [mainMeshRef, wireframeMeshRef, meshRotation]);
 
   return (
     <>

@@ -1,53 +1,79 @@
 import type { Meta, StoryObj } from "@storybook/react";
 
 import { MeshPreview, MeshPreviewProps } from ".";
-import { getExample, Example } from "@/examples/vase";
+import { getExample } from "@/examples/vase";
 
 import { getVaseModelSlices } from "@/lib/vase/vase";
-import { MeshBuilder } from "@/lib/vase/meshBuilder";
+import { MeshBuilder, TrianglesPerQuad } from "@/lib/vase/meshBuilder";
 
-const meta: Meta<typeof MeshPreview> = {
+type VasePreviewSampleProps = MeshPreviewProps & {
+  trianglesPerQuad: TrianglesPerQuad;
+};
+
+const meta: Meta<VasePreviewSampleProps> = {
   component: MeshPreview,
   parameters: {
     layout: "full",
-    controls: { exclude: ["mesh", "orbitControls", "showStats"] },
+    controls: {
+      exclude: ["mesh", "orbitControls", "showStats"],
+    },
   },
 };
 
 export default meta;
-type Story = StoryObj<typeof MeshPreview>;
+type Story = StoryObj<VasePreviewSampleProps>;
 
 export const VasePreviewSample: Story = {
   args: {
-    cameraPosition: { x: 0, y: 8, z: -10 },
+    cameraPosition: { x: 0, y: 12, z: -12 },
     cameraLookAt: { x: 0, y: 0, z: 0 },
-    meshRotation: 0,
     showModel: true,
     showWireframe: false,
     showNormals: false,
     orbitControls: true,
     showStats: true,
+    trianglesPerQuad: TrianglesPerQuad.Two,
   },
   argTypes: {
-    meshRotation: {
-      control: {
-        type: "range",
-        min: 0,
-        max: 6.2831,
-        step: 0.05,
-      },
+    trianglesPerQuad: {
+      options: Object.values(TrianglesPerQuad),
+      control: { type: "radio" },
     },
   },
   render: (args, { globals: { example } }) => {
+    const startTime = performance.now();
+
     const vase = getExample(example);
     const modelSlices = getVaseModelSlices(vase);
 
-    const meshBuilder = new MeshBuilder();
+    const generatedSlicesTime = performance.now();
+
+    const meshBuilder = new MeshBuilder(args.trianglesPerQuad);
     meshBuilder.triangulateBase(modelSlices[0]);
     meshBuilder.triangulateSlices(modelSlices);
 
+    const triangulatedSlicesTime = performance.now();
+
     const mesh = meshBuilder.build();
 
-    return <MeshPreview {...args} mesh={mesh} />;
+    const meshBuiltTime = performance.now();
+
+    const totalTime = (meshBuiltTime - startTime).toFixed(2);
+    const slicingTime = (generatedSlicesTime - startTime).toFixed(2);
+    const triangulatingTime = (
+      triangulatedSlicesTime - generatedSlicesTime
+    ).toFixed(2);
+    const buildTime = (meshBuiltTime - triangulatedSlicesTime).toFixed(2);
+
+    const timing = `Total time: ${totalTime}ms (slicing: ${slicingTime}ms, triangulating: ${triangulatingTime}, buildTime: ${buildTime}ms)`;
+    const debugStyle = { fontSize: "0.75em" };
+
+    return (
+      <>
+        <MeshPreview {...args} mesh={mesh} />
+        <div style={debugStyle}>Triangles: {mesh.triangles.length}</div>
+        <div style={debugStyle}>{timing}</div>
+      </>
+    );
   },
 };
