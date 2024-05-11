@@ -4,11 +4,8 @@ import {
   catmullRomCurvePoint,
   distanceSqr,
   estimateCatmullRomCurveLength,
-  simplifyProfilePoints,
 } from "@/lib/math2d";
-import { SidePathOptimisationSettings, SizeUnit } from "@/lib/units";
-
-const epsilon = 0.00001;
+import { SidePathOptimisationSettings, SizeUnit, Epsilon } from "@/lib/units";
 
 type SliceProperty = {
   value: WeightedNumber;
@@ -19,6 +16,7 @@ type PropertySelector = (slice: VaseSlice) => WeightedNumber | undefined;
 
 export function selectSlices(
   slices: VaseSlice[],
+  yStep: number | undefined,
   height: number,
   selector: PropertySelector
 ): SliceProperty[] {
@@ -30,7 +28,8 @@ export function selectSlices(
 
     if (value) {
       const y = slice.position * height;
-      result.push({ value, y });
+      const alignedY = yStep ? Math.round(y / yStep) * yStep : y;
+      result.push({ value, y: alignedY });
     }
   }
 
@@ -73,7 +72,9 @@ export function evaluateSlices(
       os.minDistance
     );
 
-    const steps = Math.ceil(estimatedSegmentLength / os.minDistance);
+    // get more steps than it is required from length estimation, simplify while
+    // adding new points to get more uniform result
+    const steps = 4 * Math.ceil(estimatedSegmentLength / os.minDistance);
     const step = 1 / steps;
 
     let points: Vec2[] = [p1];
@@ -94,15 +95,16 @@ export function evaluateSlices(
       point = transformFunction(point);
 
       const distSqr = distanceSqr(prevPoint, point);
-      const yDist = Math.abs(prevPoint.y - point.y);
+      const yDist = point.y - prevPoint.y;
 
-      // too close to the previous point, skip one point, but preserve the last one
       if (
-        distSqr <= os.minDistanceSqr ||
-        point.y < 0 + epsilon ||
-        point.y > height + epsilon ||
-        yDist < os.minSliceDistance
+        distSqr <= os.minDistanceSqr || // too close to the previous point
+        point.y < 0 + Epsilon || // negative y
+        point.y > height + Epsilon || // more than vase height
+        yDist < os.minSliceDistance || // too close to the previous slice
+        yDist < 0 // next point was generated below the previous one, skip
       ) {
+        // skip one point, but preserve the last one
         if (j !== steps) {
           continue;
         } else {
@@ -114,8 +116,6 @@ export function evaluateSlices(
 
       prevPoint = point;
     }
-
-    points = simplifyProfilePoints(points, os.minSimplifyArea);
 
     // Remove the last point if it's not the last segment, because it's the same as the first point of the next segment
     if (i !== sliceProperties.length - 2) {
@@ -137,19 +137,27 @@ export type Deconstructor = (
 export function getRadius(
   slices: VaseSlice[],
   height: number,
-  sizeUnit: SizeUnit
+  sizeUnit: SizeUnit,
+  yStep: number
 ): Vec2[] {
-  const sliceProperties = selectSlices(slices, height, (slice) => slice.radius);
+  const sliceProperties = selectSlices(
+    slices,
+    yStep,
+    height,
+    (slice) => slice.radius
+  );
   return evaluateSlices(sliceProperties, height, sizeUnit);
 }
 
 export function getRotation(
   slices: VaseSlice[],
   height: number,
-  sizeUnit: SizeUnit
+  sizeUnit: SizeUnit,
+  yStep: number
 ): Vec2[] {
   const sliceProperties = selectSlices(
     slices,
+    yStep,
     height,
     (slice) => slice.rotation
   );
@@ -159,7 +167,8 @@ export function getRotation(
 export function getIntensity(
   slices: VaseSlice[],
   height: number,
-  sizeUnit: SizeUnit
+  sizeUnit: SizeUnit,
+  yStep: number
 ): Vec2[] {
   const clamp = (p: Vec2) => {
     return { x: Math.min(Math.max(0, p.x), 1), y: p.y };
@@ -167,6 +176,7 @@ export function getIntensity(
 
   const sliceProperties = selectSlices(
     slices,
+    yStep,
     height,
     (slice) => slice.intensity
   );

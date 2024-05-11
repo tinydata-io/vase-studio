@@ -373,7 +373,7 @@ export const generateProfile = (
 
   sortProfilePoints(referencePoints);
 
-  var startTime = performance.now();
+  let startTime = performance.now();
 
   const curveReferencePoints = generateProfileSectionCurve(
     referencePoints,
@@ -382,7 +382,7 @@ export const generateProfile = (
     sizeUnit
   );
 
-  var endTime = performance.now();
+  let endTime = performance.now();
 
   log.debug("generateProfileCurve", endTime - startTime, "ms");
 

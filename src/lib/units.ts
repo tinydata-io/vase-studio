@@ -5,6 +5,8 @@ export enum SizeUnit {
   Inch = "in",
 }
 
+export const Epsilon = 0.00001;
+
 const InchInCentimeter = 1 / 2.54;
 const InchInCentimeterSqr = InchInCentimeter * InchInCentimeter;
 
@@ -83,6 +85,7 @@ class SideOptimisationSettings {
     minDistanceSqr: number;
     minSimplifyArea: number;
     minSliceDistance: number;
+    convertToCentimetersScale: number;
   };
 
   "in": {
@@ -90,6 +93,7 @@ class SideOptimisationSettings {
     minDistanceSqr: number;
     minSimplifyArea: number;
     minSliceDistance: number;
+    convertToCentimetersScale: number;
   };
 }
 
@@ -100,8 +104,8 @@ export const ProfileOptimisationSettings = new OptimisationSettings(
 );
 
 export const SidePathOptimisationSettings = new SideOptimisationSettings(
-  0.2,
-  0.12 ** 2,
+  0.05,
+  0.04 ** 2,
   0.5,
   0.1
 );

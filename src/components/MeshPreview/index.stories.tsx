@@ -5,6 +5,7 @@ import { getExample } from "@/examples/vase";
 
 import { getVaseModelSlices } from "@/lib/vase/vase";
 import { MeshBuilder, TrianglesPerQuad } from "@/lib/vase/meshBuilder";
+import { SidePathOptimisationSettings } from "@/lib/units";
 
 type VasePreviewSampleProps = MeshPreviewProps & {
   trianglesPerQuad: TrianglesPerQuad;
@@ -41,10 +42,14 @@ export const VasePreviewSample: Story = {
     },
   },
   render: (args, { globals: { example } }) => {
+    const vase = getExample(example);
+
+    const os = SidePathOptimisationSettings[vase.sizeUnit];
+    const yStep = 0.1 * os.convertToCentimetersScale; // 1mm layers
+
     const startTime = performance.now();
 
-    const vase = getExample(example);
-    const modelSlices = getVaseModelSlices(vase);
+    const modelSlices = getVaseModelSlices(vase, yStep);
 
     const generatedSlicesTime = performance.now();
 
