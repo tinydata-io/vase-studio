@@ -24,19 +24,6 @@ export type AABB = {
   max: Vec3;
 };
 
-type TransformedSlice = {
-  external: Vec3[];
-  originalAngles: number[];
-};
-
-export const getTriangleCenter = (t: Triangle): Vec3 => {
-  return {
-    x: (t.a.x + t.b.x + t.c.x) / 3,
-    y: (t.a.y + t.b.y + t.c.y) / 3,
-    z: (t.a.z + t.b.z + t.c.z) / 3,
-  };
-};
-
 export const getTriangleNormal = (t: Triangle): Vec3 => {
   // https://www.khronos.org/opengl/wiki/Calculating_a_Surface_Normal
   const [ax, ay, az] = [t.b.x - t.a.x, t.b.y - t.a.y, t.b.z - t.a.z];

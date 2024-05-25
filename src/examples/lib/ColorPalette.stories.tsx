@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { Color } from "../../lib/types";
+import { Color } from "@/lib/types";
 import { DefaultPalette } from "@/lib/colors";
 
 type ColorPaletteProps = {
