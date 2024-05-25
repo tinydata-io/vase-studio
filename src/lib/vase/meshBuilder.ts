@@ -85,7 +85,10 @@ export class MeshBuilder {
     this.triangles.push({ a, b, c });
   }
 
-  triangulateBase(slice: ModelSlice) {
+  triangulateSlice(
+    slice: ModelSlice,
+    addTriangle: (a: Vec3, b: Vec3, c: Vec3) => void
+  ) {
     const center = { x: 0, y: slice.y, z: 0 };
 
     for (let i = 0; i < slice.external.length; i++) {
@@ -95,8 +98,16 @@ export class MeshBuilder {
       const a = { x: sa.x, y: slice.y, z: sa.y };
       const b = { x: sb.x, y: slice.y, z: sb.y };
 
-      this.addTriangle(a, center, b);
+      addTriangle(a, center, b);
     }
+  }
+
+  triangulateBase(slice: ModelSlice) {
+    this.triangulateSlice(slice, (a, b, c) => this.addTriangle(c, b, a));
+  }
+
+  triangulateTop(slice: ModelSlice) {
+    this.triangulateSlice(slice, (a, b, c) => this.addTriangle(a, b, c));
   }
 
   connectSlices(a: Vec3[], b: Vec3[]) {
@@ -121,7 +132,7 @@ export class MeshBuilder {
         this.addTriangle(sc, sa, se);
       } else {
         this.addTriangle(sa, sb, sc);
-        this.addTriangle(sc, sd, sb);
+        this.addTriangle(sc, sb, sd);
       }
     }
   }
