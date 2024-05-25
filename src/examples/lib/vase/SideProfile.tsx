@@ -11,6 +11,7 @@ export type SideProfileProps = {
   slices: VaseSlice[];
   height: number;
   sizeUnit: SizeUnit;
+  yStep?: number;
   deconstructor: Deconstructor;
   sliceProperty: "radius" | "rotation" | "intensity";
 };
@@ -19,13 +20,15 @@ export const SideProfile = ({
   slices,
   height,
   sizeUnit,
+  yStep,
   deconstructor,
   sliceProperty,
 }: SideProfileProps) => {
   const deconstructedProfile: Vec2[] = deconstructor(
     slices,
     height,
-    sizeUnit
+    sizeUnit,
+    yStep
   ).map((point) => ({
     x: point.x,
     y: height - point.y,

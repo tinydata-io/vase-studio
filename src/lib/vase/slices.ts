@@ -131,14 +131,15 @@ export function evaluateSlices(
 export type Deconstructor = (
   slices: VaseSlice[],
   height: number,
-  sizeUnit: SizeUnit
+  sizeUnit: SizeUnit,
+  yStep: number | undefined
 ) => Vec2[];
 
 export function getRadius(
   slices: VaseSlice[],
   height: number,
   sizeUnit: SizeUnit,
-  yStep: number
+  yStep: number | undefined
 ): Vec2[] {
   const sliceProperties = selectSlices(
     slices,
@@ -153,7 +154,7 @@ export function getRotation(
   slices: VaseSlice[],
   height: number,
   sizeUnit: SizeUnit,
-  yStep: number
+  yStep: number | undefined
 ): Vec2[] {
   const sliceProperties = selectSlices(
     slices,
@@ -168,7 +169,7 @@ export function getIntensity(
   slices: VaseSlice[],
   height: number,
   sizeUnit: SizeUnit,
-  yStep: number
+  yStep: number | undefined
 ): Vec2[] {
   const clamp = (p: Vec2) => {
     return { x: Math.min(Math.max(0, p.x), 1), y: p.y };
