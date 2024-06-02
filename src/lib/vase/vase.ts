@@ -7,7 +7,7 @@ import {
   modifyProfilePoint,
   splitLongSegments,
 } from "@/components/SimpleProfile/util";
-import { Epsilon } from "@/lib/units";
+import { EPSILON } from "@/lib/units";
 
 export type ModelSlice = {
   y: number;
@@ -117,7 +117,7 @@ export const getVaseModelSlices = (vase: Vase, yStep: number): ModelSlice[] => {
 
   const ys = new Array<number>();
 
-  for (let y = 0; y <= vase.height + Epsilon; y += yStep) {
+  for (let y = 0; y <= vase.height + EPSILON; y += yStep) {
     ys.push(y);
   }
 

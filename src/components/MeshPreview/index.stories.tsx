@@ -45,11 +45,10 @@ export const VasePreviewSample: Story = {
     const vase = getExample(example);
 
     const os = SidePathOptimisationSettings[vase.sizeUnit];
-    const yStep = 0.1 * os.convertToCentimetersScale; // 1mm layers
 
     const startTime = performance.now();
 
-    const modelSlices = getVaseModelSlices(vase, yStep);
+    const modelSlices = getVaseModelSlices(vase, os.layerStep);
 
     const generatedSlicesTime = performance.now();
 

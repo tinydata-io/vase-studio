@@ -8,7 +8,7 @@ export type SideProfileProps = {
   vase: Vase;
   height: number;
   sizeUnit: SizeUnit;
-  yStep?: number;
+  yStep: number;
   deconstructor: Deconstructor;
 };
 

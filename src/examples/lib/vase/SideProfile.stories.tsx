@@ -4,8 +4,8 @@ import { SizeUnit } from "@/lib/units";
 
 import { getRotation, getRadius, getIntensity } from "@/lib/vase/slices";
 
-import { getExample, Example } from "@/examples/vase";
-import { SideProfile, SideProfileProps } from "./SideProfile";
+import { getExample } from "@/examples/vase";
+import { SideProfile } from "./SideProfile";
 
 const meta: Meta<typeof SideProfile> = {
   component: SideProfile,

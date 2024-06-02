@@ -5,7 +5,7 @@ import {
   distanceSqr,
   estimateCatmullRomCurveLength,
 } from "@/lib/math2d";
-import { SidePathOptimisationSettings, SizeUnit, Epsilon } from "@/lib/units";
+import { SidePathOptimisationSettings, SizeUnit, EPSILON } from "@/lib/units";
 
 type SliceProperty = {
   value: WeightedNumber;
@@ -16,7 +16,7 @@ type ValuesSelector = (slice: Vase) => SlicedValues;
 
 export function selectSlices(
   vase: Vase,
-  yStep: number | undefined,
+  yStep: number,
   height: number,
   selector: ValuesSelector
 ): SliceProperty[] {
@@ -101,8 +101,8 @@ export function evaluateSlices(
 
       if (
         distSqr <= os.minDistanceSqr || // too close to the previous point
-        point.y < 0 + Epsilon || // negative y
-        point.y > height + Epsilon || // more than vase height
+        point.y < 0 + EPSILON || // negative y
+        point.y > height + EPSILON || // more than vase height
         yDist < os.minSliceDistance || // too close to the previous slice
         yDist < 0 // next point was generated below the previous one, skip
       ) {
@@ -142,14 +142,14 @@ export type Deconstructor = (
   vase: Vase,
   height: number,
   sizeUnit: SizeUnit,
-  yStep: number | undefined
+  yStep: number
 ) => DeconstructedSlices;
 
 export function getRadius(
   vase: Vase,
   height: number,
   sizeUnit: SizeUnit,
-  yStep: number | undefined
+  yStep: number
 ): DeconstructedSlices {
   const sliceProperties = selectSlices(
     vase,
@@ -164,7 +164,7 @@ export function getRotation(
   vase: Vase,
   height: number,
   sizeUnit: SizeUnit,
-  yStep: number | undefined
+  yStep: number
 ): DeconstructedSlices {
   const sliceProperties = selectSlices(
     vase,
@@ -179,7 +179,7 @@ export function getIntensity(
   vase: Vase,
   height: number,
   sizeUnit: SizeUnit,
-  yStep: number | undefined
+  yStep: number
 ): DeconstructedSlices {
   const clamp = (p: Vec2) => {
     return { x: Math.min(Math.max(0, p.x), 1), y: p.y };
