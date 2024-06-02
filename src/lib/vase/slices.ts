@@ -1,4 +1,4 @@
-import { VaseSlice, WeightedNumber } from "@/lib/types";
+import { SlicedValues, Vase, WeightedNumber } from "@/lib/types";
 import {
   Vec2,
   catmullRomCurvePoint,
@@ -12,25 +12,27 @@ type SliceProperty = {
   y: number;
 };
 
-type PropertySelector = (slice: VaseSlice) => WeightedNumber | undefined;
+type ValuesSelector = (slice: Vase) => SlicedValues;
 
 export function selectSlices(
-  slices: VaseSlice[],
+  vase: Vase,
   yStep: number | undefined,
   height: number,
-  selector: PropertySelector
+  selector: ValuesSelector
 ): SliceProperty[] {
-  const sortedSlices = [...slices].sort((a, b) => a.position - b.position);
+  const slices = Object.entries(selector(vase)).map(([position, value]) => ({
+    position: parseFloat(position) * height, // will be upgraded to different type in the future
+    value,
+  }));
+
+  const sortedSlices = slices.sort((a, b) => a.position - b.position);
+
   const result: SliceProperty[] = [];
 
   for (const slice of sortedSlices) {
-    const value = selector(slice);
-
-    if (value) {
-      const y = slice.position * height;
-      const alignedY = yStep ? Math.round(y / yStep) * yStep : y;
-      result.push({ value, y: alignedY });
-    }
+    const y = slice.position;
+    const alignedY = yStep ? Math.round(y / yStep) * yStep : y;
+    result.push({ value: slice.value, y: alignedY });
   }
 
   return result;
@@ -43,7 +45,7 @@ export function evaluateSlices(
   height: number,
   sizeUnit: SizeUnit,
   transformFunction: TransformFunction = (p: Vec2) => p
-): Vec2[] {
+): DeconstructedSlices {
   const result = [];
 
   const os = SidePathOptimisationSettings[sizeUnit];
@@ -125,61 +127,69 @@ export function evaluateSlices(
     result.push(...points);
   }
 
-  return result;
+  return {
+    sliceProperties: sliceProperties,
+    values: result,
+  };
 }
 
+export type DeconstructedSlices = {
+  sliceProperties: SliceProperty[];
+  values: Vec2[];
+};
+
 export type Deconstructor = (
-  slices: VaseSlice[],
+  vase: Vase,
   height: number,
   sizeUnit: SizeUnit,
   yStep: number | undefined
-) => Vec2[];
+) => DeconstructedSlices;
 
 export function getRadius(
-  slices: VaseSlice[],
+  vase: Vase,
   height: number,
   sizeUnit: SizeUnit,
   yStep: number | undefined
-): Vec2[] {
+): DeconstructedSlices {
   const sliceProperties = selectSlices(
-    slices,
+    vase,
     yStep,
     height,
-    (slice) => slice.radius
+    (vase) => vase.radius
   );
   return evaluateSlices(sliceProperties, height, sizeUnit);
 }
 
 export function getRotation(
-  slices: VaseSlice[],
+  vase: Vase,
   height: number,
   sizeUnit: SizeUnit,
   yStep: number | undefined
-): Vec2[] {
+): DeconstructedSlices {
   const sliceProperties = selectSlices(
-    slices,
+    vase,
     yStep,
     height,
-    (slice) => slice.rotation
+    (vase) => vase.rotation
   );
   return evaluateSlices(sliceProperties, height, sizeUnit);
 }
 
 export function getIntensity(
-  slices: VaseSlice[],
+  vase: Vase,
   height: number,
   sizeUnit: SizeUnit,
   yStep: number | undefined
-): Vec2[] {
+): DeconstructedSlices {
   const clamp = (p: Vec2) => {
     return { x: Math.min(Math.max(0, p.x), 1), y: p.y };
   };
 
   const sliceProperties = selectSlices(
-    slices,
+    vase,
     yStep,
     height,
-    (slice) => slice.intensity
+    (vase) => vase.intensity
   );
   return evaluateSlices(sliceProperties, height, sizeUnit, clamp);
 }

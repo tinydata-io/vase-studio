@@ -1,4 +1,4 @@
-import { Vase, VaseSlice } from "@/lib/types";
+import { Vase } from "@/lib/types";
 import { Vec2, rotate } from "@/lib/math2d";
 
 import { getRotation, getRadius, getIntensity } from "@/lib/vase/slices";
@@ -87,20 +87,22 @@ const interpolate = function (y: number, ps?: Vec2, ns?: Vec2): number {
 export const getVaseModelSlices = (vase: Vase, yStep: number): ModelSlice[] => {
   const result = Array<ModelSlice>();
 
-  const rotationSlices = getRotation(
-    vase.slices,
+  const { values: rotationSlices } = getRotation(
+    vase,
     vase.height,
     vase.sizeUnit,
     yStep
   );
-  const radiusSlices = getRadius(
-    vase.slices,
+
+  const { values: radiusSlices } = getRadius(
+    vase,
     vase.height,
     vase.sizeUnit,
     yStep
   );
-  const intensitySlices = getIntensity(
-    vase.slices,
+
+  const { values: intensitySlices } = getIntensity(
+    vase,
     vase.height,
     vase.sizeUnit,
     yStep

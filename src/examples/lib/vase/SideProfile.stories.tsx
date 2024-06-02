@@ -15,7 +15,7 @@ const meta: Meta<typeof SideProfile> = {
   },
   render: (args, { globals: { example } }) => {
     const vase = getExample(example);
-    return <SideProfile {...args} slices={vase.slices} />;
+    return <SideProfile {...args} vase={vase} />;
   },
   argTypes: {
     height: {
@@ -37,7 +37,6 @@ export const Radius: Story = {
     sizeUnit: SizeUnit.Centimeter,
     height: 10,
     deconstructor: getRadius,
-    sliceProperty: "radius",
   },
 };
 
@@ -46,7 +45,6 @@ export const Rotation: Story = {
     sizeUnit: SizeUnit.Centimeter,
     height: 10,
     deconstructor: getRotation,
-    sliceProperty: "rotation",
   },
 };
 
@@ -55,6 +53,5 @@ export const Intensity: Story = {
     sizeUnit: SizeUnit.Centimeter,
     height: 10,
     deconstructor: getIntensity,
-    sliceProperty: "intensity",
   },
 };

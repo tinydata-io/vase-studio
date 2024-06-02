@@ -24,12 +24,10 @@ export type VaseProfile = {
   pointSets: PointSet[];
 };
 
-// Slice describes parameters of a single horizontal section of the vase
-export type VaseSlice = {
-  position: number; // position of the slice, expressed as 0-1 in terms of vase height
-  radius?: WeightedNumber; // radius of the slice, expressed in sizeUnit
-  rotation?: WeightedNumber; // rotation of the slice, expressed in degrees
-  intensity?: WeightedNumber; // intensity of the profile, expressed as 0 (circle) - 1 (full profile)
+// position is number, but will be replaced with a custom slice position type, saved as string
+export type SlicePosition = string;
+export type SlicedValues = {
+  [position: number]: WeightedNumber;
 };
 
 export type Vase = {
@@ -37,5 +35,8 @@ export type Vase = {
   height: number; // height of the vase in sizeUnit
   thickness: number; // thickness of the vase in sizeUnit
   profile: VaseProfile;
-  slices: VaseSlice[]; // vase requires at least one section, it will be extended to the full height
+
+  radius: SlicedValues;
+  rotation: SlicedValues;
+  intensity: SlicedValues;
 };

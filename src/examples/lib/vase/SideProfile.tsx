@@ -1,35 +1,32 @@
-import type { Meta, StoryObj } from "@storybook/react";
-
-import { Vec2 } from "@/lib/math2d";
-import { VaseSlice } from "@/lib/types";
+import { Vase } from "@/lib/types";
 import { SizeUnit } from "@/lib/units";
 
 import { Curve } from "@/components/svg";
 import { Deconstructor } from "@/lib/vase/slices";
 
 export type SideProfileProps = {
-  slices: VaseSlice[];
+  vase: Vase;
   height: number;
   sizeUnit: SizeUnit;
   yStep?: number;
   deconstructor: Deconstructor;
-  sliceProperty: "radius" | "rotation" | "intensity";
 };
 
 export const SideProfile = ({
-  slices,
+  vase,
   height,
   sizeUnit,
   yStep,
   deconstructor,
-  sliceProperty,
 }: SideProfileProps) => {
-  const deconstructedProfile: Vec2[] = deconstructor(
-    slices,
+  const { sliceProperties, values } = deconstructor(
+    vase,
     height,
     sizeUnit,
     yStep
-  ).map((point) => ({
+  );
+
+  const deconstructedProfile = values.map((point) => ({
     x: point.x,
     y: height - point.y,
   }));
@@ -49,13 +46,13 @@ export const SideProfile = ({
       height={512}
       style={{ border: "1px solid black" }}
     >
-      {slices.map(
+      {sliceProperties.map(
         (slice, i) =>
-          slice[sliceProperty] && (
+          slice && (
             <circle
               key={i}
-              cy={height - slice.position * height}
-              cx={slice[sliceProperty]!.value}
+              cy={height - slice.y}
+              cx={slice.value.value}
               r={0.2}
               fill="red"
             />

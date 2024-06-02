@@ -60,50 +60,27 @@ const sampleVase: Vase = {
       },
     ],
   },
-  slices: [
-    {
-      position: 0,
-      radius: { value: 3, weightIn: 1, weightOut: 1 },
-      rotation: { value: 0 },
-      intensity: { value: 0 },
-    },
-    {
-      position: 0.2,
-      rotation: { value: Math.PI * 0.125 },
-    },
-    {
-      position: 0.3,
-      radius: { value: 4, weightIn: 0, weightOut: 0 },
-      intensity: { value: 1 },
-    },
-    {
-      position: 0.5,
-      radius: { value: 4, weightIn: 0.5, weightOut: 0 },
-    },
-    {
-      position: 0.7,
-      intensity: { value: 1 },
-    },
-    {
-      position: 0.8,
-      radius: { value: 2 },
-      rotation: { value: Math.PI * 0.875 },
-    },
-    {
-      position: 0.9,
-      intensity: { value: 0.2 },
-    },
-    {
-      position: 0.97,
-      intensity: { value: 0.0 },
-    },
-    {
-      position: 1.0,
-      radius: { value: 3, weightIn: 0, weightOut: 1 },
-      rotation: { value: Math.PI },
-      intensity: { value: 0 },
-    },
-  ],
+  radius: {
+    "0": { value: 3, weightIn: 1, weightOut: 1 },
+    "0.3": { value: 4, weightIn: 0, weightOut: 0 },
+    "0.5": { value: 4, weightIn: 0.5, weightOut: 0 },
+    "0.8": { value: 2 },
+    "1": { value: 3, weightIn: 0, weightOut: 1 },
+  },
+  rotation: {
+    "0": { value: 0 },
+    "0.2": { value: Math.PI * 0.125 },
+    "0.8": { value: Math.PI * 0.875 },
+    "1": { value: Math.PI },
+  },
+  intensity: {
+    "0": { value: 0 },
+    "0.3": { value: 1 },
+    "0.7": { value: 1 },
+    "0.9": { value: 0.2 },
+    "0.97": { value: 0 },
+    "1": { value: 0 },
+  },
 };
 
 const realVase: Vase = {
@@ -133,39 +110,25 @@ const realVase: Vase = {
       },
     ],
   },
-  slices: [
-    {
-      position: 0,
-      radius: { value: 2.5 },
-      rotation: { value: 0 },
-      intensity: { value: 0 },
-    },
-    {
-      position: 0.3,
-      radius: { value: 3 },
-      rotation: { value: Math.PI * 0.125 },
-      intensity: { value: 1 },
-    },
-    {
-      position: 0.6,
-      radius: { value: 2 },
-    },
-    {
-      position: 0.7,
-      rotation: { value: Math.PI * 0.875 },
-      intensity: { value: 0.3 },
-    },
-    {
-      position: 0.8,
-      radius: { value: 1.4 },
-    },
-    {
-      position: 1.0,
-      radius: { value: 1.5 },
-      rotation: { value: Math.PI },
-      intensity: { value: 0 },
-    },
-  ],
+  radius: {
+    "0": { value: 2.5 },
+    "0.3": { value: 3 },
+    "0.6": { value: 2 },
+    "0.8": { value: 1.4 },
+    "1": { value: 1.5 },
+  },
+  rotation: {
+    "0": { value: 0 },
+    "0.3": { value: Math.PI * 0.125 },
+    "0.7": { value: Math.PI * 0.875 },
+    "1": { value: Math.PI },
+  },
+  intensity: {
+    "0": { value: 0 },
+    "0.3": { value: 1 },
+    "0.7": { value: 0.3 },
+    "1": { value: 0 },
+  },
 };
 
 const realVase2: Vase = {
@@ -221,42 +184,25 @@ const realVase2: Vase = {
       },
     ],
   },
-  slices: [
-    {
-      position: 0,
-      radius: { value: 2.5 },
-      rotation: { value: 0 },
-      intensity: { value: 0 },
-    },
-    {
-      position: 0.2,
-      rotation: { value: Math.PI * 0.25 },
-    },
-    {
-      position: 0.3,
-      radius: { value: 3 },
-      intensity: { value: 1 },
-    },
-    {
-      position: 0.6,
-      radius: { value: 2 },
-    },
-    {
-      position: 0.8,
-      radius: { value: 1.4 },
-      rotation: { value: Math.PI * 1.25 },
-    },
-    {
-      position: 0.9,
-      intensity: { value: 0.3 },
-    },
-    {
-      position: 1.0,
-      radius: { value: 1.5 },
-      rotation: { value: Math.PI * 1.5 },
-      intensity: { value: 0 },
-    },
-  ],
+  radius: {
+    "0": { value: 2.5 },
+    "0.3": { value: 3 },
+    "0.6": { value: 2 },
+    "0.8": { value: 1.4 },
+    "1": { value: 1.5 },
+  },
+  rotation: {
+    "0": { value: 0 },
+    "0.2": { value: Math.PI * 0.25 },
+    "0.8": { value: Math.PI * 1.25 },
+    "1": { value: Math.PI * 1.5 },
+  },
+  intensity: {
+    "0": { value: 0 },
+    "0.3": { value: 1 },
+    "0.9": { value: 0.3 },
+    "1": { value: 0 },
+  },
 };
 
 const squareVase: Vase = {
@@ -276,20 +222,18 @@ const squareVase: Vase = {
       },
     ],
   },
-  slices: [
-    {
-      position: 0,
-      radius: { value: 3, weightIn: 1, weightOut: 1 },
-      rotation: { value: 0, weightIn: 1, weightOut: 1 },
-      intensity: { value: 0, weightIn: 1, weightOut: 1 },
-    },
-    {
-      position: 1,
-      radius: { value: 3, weightIn: 1, weightOut: 1 },
-      rotation: { value: -Math.PI / 2, weightIn: 1, weightOut: 1 },
-      intensity: { value: 0, weightIn: 1, weightOut: 1 },
-    },
-  ],
+  radius: {
+    "0": { value: 3, weightIn: 1, weightOut: 1 },
+    "1": { value: 3, weightIn: 1, weightOut: 1 },
+  },
+  rotation: {
+    "0": { value: 0, weightIn: 1, weightOut: 1 },
+    "1": { value: -1.5707963267948966, weightIn: 1, weightOut: 1 },
+  },
+  intensity: {
+    "0": { value: 0, weightIn: 1, weightOut: 1 },
+    "1": { value: 0, weightIn: 1, weightOut: 1 },
+  },
 };
 
 const barrelVase: Vase = {
@@ -309,22 +253,17 @@ const barrelVase: Vase = {
       },
     ],
   },
-  slices: [
-    {
-      position: 0,
-      radius: { value: 3 },
-      rotation: { value: 0, weightIn: 1, weightOut: 1 },
-      intensity: { value: 0, weightIn: 1, weightOut: 1 },
-    },
-    {
-      position: 0.5,
-      radius: { value: 4 },
-    },
-    {
-      position: 1,
-      radius: { value: 3 },
-      rotation: { value: -Math.PI / 2, weightIn: 1, weightOut: 1 },
-      intensity: { value: 0, weightIn: 1, weightOut: 1 },
-    },
-  ],
+  radius: {
+    "0": { value: 3 },
+    "0.5": { value: 4 },
+    "1": { value: 3 },
+  },
+  rotation: {
+    "0": { value: 0, weightIn: 1, weightOut: 1 },
+    "1": { value: Math.PI * -0.5, weightIn: 1, weightOut: 1 },
+  },
+  intensity: {
+    "0": { value: 0, weightIn: 1, weightOut: 1 },
+    "1": { value: 0, weightIn: 1, weightOut: 1 },
+  },
 };
