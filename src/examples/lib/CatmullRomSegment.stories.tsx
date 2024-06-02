@@ -4,7 +4,7 @@ import {
   catmullRomCurvePoint,
   estimateCatmullRomCurveLength,
   simplifyProfilePoints,
-} from "./math2d";
+} from "@/lib/math2d";
 
 import { Curve } from "@/components/svg";
 
@@ -64,6 +64,24 @@ const CatmullRomSegment = ({
 const meta: Meta<typeof CatmullRomSegment> = {
   component: CatmullRomSegment,
   parameters: { layout: "centered" },
+  argTypes: {
+    weightStart: {
+      control: {
+        type: "range",
+        min: 0,
+        max: 1,
+        step: 0.1,
+      },
+    },
+    weightEnd: {
+      control: {
+        type: "range",
+        min: 0,
+        max: 1,
+        step: 0.1,
+      },
+    },
+  },
 };
 
 export default meta;

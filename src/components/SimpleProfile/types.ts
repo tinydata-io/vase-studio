@@ -12,6 +12,7 @@ export type GeneratedProfile = {
   referencePoints: ProfilePoint[];
   controlPoints: ProfilePoint[];
   curvePoints: Vec2[];
+  subdivisions: number[];
   sections: number;
   angleStart: number;
   angleStep: number;

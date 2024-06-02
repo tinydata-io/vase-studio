@@ -13,7 +13,11 @@ import { Color, VaseProfile } from "@/lib/types";
 
 import { Curve } from "@/components/svg";
 
-import { calculateDrawProps, generateProfile } from "./util";
+import {
+  calculateDrawProps,
+  generateProfile,
+  modifyProfilePoint,
+} from "./util";
 import { GuideLines } from "./GuideLines";
 import { GuideArc } from "./GuideArc";
 import { ProfilePoints } from "./ProfilePoints";
@@ -26,6 +30,7 @@ export type SimpleProfileProps = {
   width: number;
   height: number;
   debugPoints?: boolean;
+  intensity?: number;
 };
 
 export const SimpleProfile = ({
@@ -36,6 +41,7 @@ export const SimpleProfile = ({
   height,
   colors,
   debugPoints,
+  intensity,
 }: SimpleProfileProps) => {
   const maxOffset = profile.pointSets.reduce(
     (max, { offset }) => Math.max(max, offset.value),
@@ -44,7 +50,23 @@ export const SimpleProfile = ({
 
   const profileRadius = profileDiameter / 2;
 
+  const desiredIntensity = intensity == undefined ? 1 : intensity;
   const generatedProfile = generateProfile(profileRadius, sizeUnit, profile);
+  const controlPoints = generatedProfile.controlPoints.map((pp) => {
+    return {
+      ...pp,
+      position: modifyProfilePoint(
+        pp.position,
+        profileRadius,
+        profileRadius,
+        desiredIntensity
+      ),
+    };
+  });
+
+  const curvePoints = generatedProfile.curvePoints.map((cp) =>
+    modifyProfilePoint(cp, profileRadius, profileRadius, desiredIntensity)
+  );
 
   const drawProps = calculateDrawProps(
     profileRadius,
@@ -57,17 +79,17 @@ export const SimpleProfile = ({
       <GuideLines {...drawProps} />
       <GuideArc {...drawProps} />
       <ProfilePoints
-        profilePoints={generatedProfile.controlPoints}
+        profilePoints={controlPoints}
         colors={colors}
         {...drawProps}
       />
       <Curve
-        curvePoints={generatedProfile.curvePoints}
+        curvePoints={curvePoints}
         strokeWidth={drawProps.strokeWidth}
         closed={true}
       />
       {debugPoints &&
-        generatedProfile.curvePoints.map((cp, index) => (
+        curvePoints.map((cp, index) => (
           <circle
             key={index}
             cx={cp.x}
